@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Instructions</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1976d2;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .back-button {
+            background-color: white;
+            color: #1976d2;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #d0e5fb;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        h2 {
+            color: #1565c0;
+        }
+
+        h3 {
+            margin-top: 25px;
+            color: #333;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        .policy {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px solid #bbb;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Student Instructions</h1>
+        <a href="/student-dashboard.html" class="back-button">Back to Dashboard</a>
+    </header>
+
+    <div class="container">
+        <h2>Attempt Exam</h2>
+        <p>On your dashboard, select an exam. If the exam is protected, enter the password provided by your teacher. You
+            will have limited time based on the exam settings.</p>
+
+        <h3>Result</h3>
+        <p>After submitting the exam (or auto-submission upon timeout), 
+            you will see your total marks and performance.
+            Leaderboard will reflect your rank if enabled.</p>
+
+        <h3>Practice Exam</h3>
+        <p>You can reattempt any completed exam in practice mode. Marks from practice mode will not affect leaderboard
+            or your profile stats. Your leaderboard will be shown in disqualified block.
+        </p>
+
+        <h3>Update Settings</h3>
+        <p>
+            You can edit your Full Name, Institution, Bio, and Profile Picture. You can reset your password using email
+            verification if forgotten.
+            You can't change your username directly — contact the admin to request a username change.
+        </p>
+
+        <div class="policy">
+            <strong>Privacy & Policy:</strong> Your answers and scores are securely stored. Do not try to refresh or
+            reload the exam page—doing so may disqualify you.
+            You can hide your scores in every exam from your profile. Never share your email or password with others.
+        </div>
+    </div>
+
+</body>
+
+</html>

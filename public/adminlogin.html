@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin Login | ExamSys</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .admin-login-container {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 40px 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #00c6ff;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        button {
+            margin-top: 25px;
+            width: 100%;
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #005ce6;
+        }
+
+        #secretCodeWrapper {
+            display: none;
+        }
+
+        #statusMessage {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #a0e0ff;
+            display: none;
+        }
+
+        #revealIdBtn {
+            margin-top: 10px;
+            background: transparent;
+            color: #00c6ff;
+            border: 1px solid #00c6ff;
+            font-weight: 600;
+        }
+
+        #adminIdWrapper {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-login-container">
+        <h2>Admin Login</h2>
+        <form id="adminLoginForm">
+            <div id="revealButtonWrapper">
+                <button type="button" id="revealIdBtn">🔐 Reveal Admin ID Field</button>
+            </div>
+
+            <div id="adminIdWrapper">
+                <label for="adminId">Secret ID</label>
+                <input type="text" name="adminId" id="adminId" required />
+            </div>
+
+            <div id="secretCodeWrapper">
+                <label for="adminCode">Secret Code</label>
+                <input type="text" name="adminCode" id="adminCode" maxlength="8" />
+            </div>
+
+            <div id="statusMessage">A secret code is being sent to the admin's email. Please wait…</div>
+
+            <button type="submit">Next</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('adminLoginForm');
+        const adminIdWrapper = document.getElementById('adminIdWrapper');
+        const revealIdBtn = document.getElementById('revealIdBtn');
+        const secretCodeWrapper = document.getElementById('secretCodeWrapper');
+        const statusMessage = document.getElementById('statusMessage');
+        let step = 1;
+
+        revealIdBtn.addEventListener('click', () => {
+            adminIdWrapper.style.display = 'block';
+            revealIdBtn.style.display = 'none';
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const adminId = document.getElementById('adminId').value;
+
+            if (step === 1) {
+                // Step 1: Show status message immediately
+                statusMessage.textContent = "A secret code is being sent to the admin's email. Please wait…";
+                statusMessage.style.display = 'block';
+
+                // Send request to backend
+                const res = await fetch('/admin/request-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminId }),
+                });
+
+                const result = await res.text();
+
+                if (result === 'Code Sent') {
+                    // After 1s: hide message, show code input
+                    setTimeout(() => {
+                        statusMessage.style.display = 'none';
+                        secretCodeWrapper.style.display = 'block';
+                        form.querySelector('button').textContent = 'Verify Code';
+                    }, 1000);
+                    step = 2;
+                } else {
+                    statusMessage.style.display = 'none';
+                    alert(result);
+                }
+            } else if (step === 2) {
+                const adminCode = document.getElementById('adminCode').value;
+
+                const res = await fetch('/admin/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminId, adminCode }),
+                });
+
+                const result = await res.text();
+
+                if (result === 'Success') {
+                    window.location.href = '/admindashboard';
+                } else {
+                    alert(result);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

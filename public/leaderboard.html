@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Exam Leaderboard</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: linear-gradient(to bottom right, #eef1fc, #f9f9ff);
+      color: #333;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    h1 {
+      color: #2c2277;
+      margin-bottom: 25px;
+      font-size: 2rem;
+    }
+
+    .buttons {
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      background-color: #2c2277;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 10px 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .btn:hover {
+      background-color: #1f1a5a;
+      transform: scale(1.03);
+    }
+
+    .section-title {
+      margin-top: 40px;
+      margin-bottom: 15px;
+      color: #2c2277;
+      font-size: 1.5rem;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0 auto 40px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(57, 40, 167, 0.1);
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    th {
+      background-color: #2c2277;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f3f4ff;
+    }
+
+    .profile-pic {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+      border: 2px solid #2c2277;
+    }
+
+    .name-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    tr.qualified-row {
+      background-color: #e8f5e9 !important;
+    }
+
+    tr.disqualified-row {
+      background-color: #fdecea !important;
+    }
+
+    .rank-icon {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .gold {
+      color: #FFD700;
+    }
+
+    .silver {
+      color: #C0C0C0;
+    }
+
+    .bronze {
+      color: #CD7F32;
+    }
+
+    @media (max-width: 768px) {
+
+      table,
+      th,
+      td {
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 8px 14px;
+        font-size: 14px;
+      }
+
+      .section-title {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1><i class="fas fa-trophy"></i> Exam Leaderboard</h1>
+
+    <div class="buttons">
+      <button class="btn" id="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="btn" id="view-questions-btn"><i class="fas fa-list-ul"></i> View Questions</button>
+    </div>
+
+    <h2 class="section-title"><i class="fas fa-check-circle"></i> Qualified Students</h2>
+    <table id="qualified-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Institution</th>
+          <th>Correct Answers</th>
+          <th>Wrong Answers</th>
+          <th>Not Answered</th>
+          <th>Marks Obtained</th>
+          <th>Submitted At</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2 class="section-title"><i class="fas fa-times-circle"></i> Disqualified Students</h2>
+    <table id="disqualified-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Institution</th>
+          <th>Correct Answers</th>
+          <th>Wrong Answers</th>
+          <th>Not Answered</th>
+          <th>Marks Obtained</th>
+          <th>Submitted At</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const urlParts = window.location.pathname.split('/');
+    const examId = urlParts[2];
+
+    let total_question = null;
+    let total = null;
+
+    const qualifiedTableBody = document.querySelector('#qualified-table tbody');
+    const disqualifiedTableBody = document.querySelector('#disqualified-table tbody');
+
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function createRow(student, isDisqualified = false, rank = null) {
+      const tr = document.createElement('tr');
+      tr.classList.add(isDisqualified ? 'disqualified-row' : 'qualified-row');
+
+      const rankTd = document.createElement('td');
+      rankTd.textContent = isDisqualified
+        ? 'N/A'
+        : rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+      tr.appendChild(rankTd);
+
+      const nameTd = document.createElement('td');
+      nameTd.classList.add('name-cell');
+      const img = document.createElement('img');
+      img.className = 'profile-pic';
+      img.src = student.profile_pic || '/uploads/default.png';
+      img.alt = student.full_name + ' profile pic';
+      nameTd.appendChild(img);
+      const spanName = document.createElement('span');
+      spanName.textContent = student.full_name;
+      nameTd.appendChild(spanName);
+      tr.appendChild(nameTd);
+
+      const institutionTd = document.createElement('td');
+      institutionTd.textContent = student.institution || '-';
+      tr.appendChild(institutionTd);
+
+      const correct = Number(student.correct_answer) || 0;
+      const wrong = Number(student.wrong_answer) || 0;
+      const unattempted = Math.max(0, (Number(total_question) || 0) - (correct + wrong));
+
+      tr.appendChild(createTd(correct));
+      tr.appendChild(createTd(wrong));
+      tr.appendChild(createTd(unattempted));
+      tr.appendChild(createTd(`${student.total_marks ?? 0}/${total}`));
+      tr.appendChild(createTd(formatDateTime(student.submitted_at)));
+
+      return tr;
+    }
+
+    function createTd(text) {
+      const td = document.createElement('td');
+      td.textContent = text;
+      return td;
+    }
+
+    function fetchLeaderboard() {
+      fetch(`/api/exam/${examId}/leaderboard`)
+        .then(res => res.json())
+        .then(data => {
+          total = data.total_marks;
+          total_question = data.total_question;
+
+          qualifiedTableBody.innerHTML = '';
+          disqualifiedTableBody.innerHTML = '';
+
+          if (!data.qualified.length) {
+            qualifiedTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#777;">No qualified students.</td></tr>`;
+          } else {
+            data.qualified.forEach(student => {
+              const row = createRow(student, false, student.rank);
+              qualifiedTableBody.appendChild(row);
+            });
+          }
+
+          if (!data.disqualified.length) {
+            disqualifiedTableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#777;">No disqualified students.</td></tr>`;
+          } else {
+            data.disqualified.forEach(student => {
+              const row = createRow(student, true);
+              disqualifiedTableBody.appendChild(row);
+            });
+          }
+        })
+        .catch(err => {
+          console.error('Error loading leaderboard:', err);
+          qualifiedTableBody.innerHTML = '<tr><td colspan="8">Failed to load leaderboard data.</td></tr>';
+          disqualifiedTableBody.innerHTML = '<tr><td colspan="8">Failed to load leaderboard data.</td></tr>';
+        });
+    }
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      window.history.back();
+    });
+
+    document.getElementById('view-questions-btn').addEventListener('click', () => {
+      window.location.href = `/exam/${examId}/questions`;
+    });
+
+    fetchLeaderboard();
+  </script>
+
+</body>
+
+</html>

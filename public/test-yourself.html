@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Yourself</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f9f9ff;
+      color: #333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #2c2277;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .timer {
+      font-size: 20px;
+      color: red;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .question {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      margin-bottom: 25px;
+      transition: transform 0.3s;
+    }
+
+    .question:hover {
+      transform: scale(1.01);
+    }
+
+    .question p {
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .question img {
+      max-width: 100%;
+      max-height: 220px;
+      display: block;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    label:hover {
+      background: #f0f0fc;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    .option-img {
+      max-height: 60px;
+      margin-left: 8px;
+      vertical-align: middle;
+      border-radius: 4px;
+    }
+
+    .submit-btn {
+      display: block;
+      margin: 40px auto;
+      padding: 12px 30px;
+      font-size: 16px;
+      background-color: #2c2277;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(44, 34, 119, 0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #1f1a5a;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Test Yourself</h1>
+    <div class="timer" id="timer">Loading...</div>
+    <form id="exam-form"></form>
+    <button class="submit-btn" onclick="submitAnswers(false)">Submit</button>
+  </div>
+
+  <script>
+    const examId = window.location.pathname.split('/')[2];
+    let studentId = null;
+    let endTime = null;
+    let intervalId;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetch(`/api/exam/${examId}/testQuestions`)
+        .then(res => res.json())
+        .then(data => {
+          studentId = data.student_id;
+          const duration = data.duration;
+          endTime = new Date(Date.now() + duration * 60000);
+          localStorage.setItem('exam_end', endTime.toISOString());
+          localStorage.setItem('exam_questions', JSON.stringify(data.questions));
+          startExam(data.questions);
+        })
+        .catch(err => {
+          document.getElementById('timer').textContent = "Failed to load exam data.";
+          console.error(err);
+        });
+    });
+
+    function startExam(questions) {
+      renderQuestions(questions);
+      renderTimer();
+      intervalId = setInterval(renderTimer, 1000);
+    }
+
+    function renderTimer() {
+      const now = new Date();
+      const remaining = endTime - now;
+
+      if (remaining <= 0) {
+        clearInterval(intervalId);
+        document.getElementById('timer').textContent = "Time's up! Auto submitting...";
+        submitAnswers(true);
+        return;
+      }
+
+      const mins = Math.floor(remaining / 60000);
+      const secs = Math.floor((remaining % 60000) / 1000);
+      document.getElementById('timer').textContent = `Time Left: ${mins}m ${secs < 10 ? '0' + secs : secs}s`;
+    }
+
+    function renderQuestions(questions) {
+      const form = document.getElementById('exam-form');
+      questions.forEach(q => {
+        const div = document.createElement('div');
+        div.className = 'question';
+
+        let html = '';
+        if (q.question_text) html += `<p>${q.question_text}</p>`;
+        if (q.question_image) html += `<img src="${q.question_image}" alt="Question Image">`;
+
+        q.options.forEach(o => {
+          const optionContent = o.option_image
+            ? `<img src="${o.option_image}" alt="Option Image" class="option-img">`
+            : o.option_text;
+
+          html += `<label>
+                     <input type="radio" name="q${q.question_id}" value="${o.option_id}">
+                     ${optionContent}
+                   </label>`;
+        });
+
+        div.innerHTML = html;
+        form.appendChild(div);
+      });
+    }
+
+    function submitAnswers(isAuto) {
+      const form = document.getElementById('exam-form');
+      const formData = new FormData(form);
+      const questions = JSON.parse(localStorage.getItem('exam_questions'));
+
+      const answers = questions.map(q => ({
+        question_id: q.question_id,
+        selected_option_id: parseInt(formData.get(`q${q.question_id}`)) || null
+      }));
+
+      fetch(`/api/exam/${examId}/testSubmit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId,
+          answers,
+          isAutoSubmitted: isAuto
+        })
+      })
+      .then(res => res.json())
+      .then(() => {
+        alert("Submission successful!");
+        localStorage.removeItem('exam_end');
+        localStorage.removeItem('exam_questions');
+        window.location.href = `/exam/${examId}/testResult/${studentId}`;
+      })
+      .catch(err => {
+        alert("Failed to submit. Please try again.");
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>

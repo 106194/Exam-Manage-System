@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Profile Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #4a47a3;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #373482;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 80px auto 50px auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .profile-header img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 5px solid #4a47a3;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .profile-header img:hover {
+      transform: scale(1.05);
+    }
+
+    .info h2 {
+      margin: 0;
+      font-size: 32px;
+      color: #2d2a6e;
+    }
+
+    .info p {
+      font-size: 16px;
+      margin-top: 10px;
+      color: #555;
+    }
+
+    .details-section {
+      margin-bottom: 40px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .details-grid .card {
+      background: #f5f8ff;
+      border-left: 5px solid #4a47a3;
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .exam-section h3 {
+      color: #2d2a6e;
+      margin-bottom: 15px;
+    }
+
+    .exam-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .exam-list li {
+      padding: 12px 18px;
+      background-color: #eef2fb;
+      margin-bottom: 12px;
+      border-left: 5px solid #4a47a3;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .exam-list li span {
+      font-weight: bold;
+      color: #333;
+    }
+
+    .exam-list li em {
+      color: #777;
+      font-style: italic;
+    }
+
+    .exam-list .details-btn {
+      background: #4a47a3;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: auto;
+    }
+
+    .toggle-btn {
+      margin-top: 25px;
+      padding: 10px 16px;
+      background-color: #4a47a3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      padding-top: 60px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #000;
+    }
+
+    .close {
+      position: absolute;
+      top: 25px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 35px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#" onclick="goBack()" class="back-button">← Back</a>
+  <div class="container">
+    <div class="profile-header">
+      <img id="profile-pic" src="/uploads/default.png" alt="Profile Picture" />
+      <div class="info">
+        <h2 id="user-name">User Name</h2>
+        <p><strong>Bio:</strong> <span id="user-bio">This is a sample bio.</span></p>
+      </div>
+    </div>
+    <div class="details-section">
+      <div class="details-grid">
+        <div class="card"><strong>Registration Date:</strong> <span id="registration-date">N/A</span></div>
+        <div class="card"><strong>Institution:</strong> <span id="institution">N/A</span></div>
+        <div class="card" id="extra-field-1"><strong>Total:</strong> N/A</div>
+        <div class="card" id="extra-field-2"><strong>Accuracy:</strong> N/A</div>
+      </div>
+      <button id="toggle-score-btn" class="toggle-btn">Toggle Score Visibility</button>
+    </div>
+    <div class="exam-section">
+      <h3 id="exam-title">Exam List</h3>
+      <ul class="exam-list" id="exam-list">
+        <li><em title="No exam data available">N/A</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="img-modal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="enlarged-pic">
+  </div>
+
+  <script>
+    const username = window.location.pathname.split("/").pop();
+    let role = null, currentUser = null, userId = null, score_hidden = null;
+    let userRole=null;
+    const toggleBtn = document.getElementById('toggle-score-btn');
+
+    fetch(`/api/users/${username}`)
+      .then(res => res.json())
+      .then(user => {
+        document.getElementById('profile-pic').src = user.profile_pic || '/uploads/default.png';
+        document.getElementById('user-name').textContent = user.full_name;
+        document.getElementById('user-bio').textContent = user.bio || 'No bio provided.';
+        document.getElementById('registration-date').textContent = user.registration_date ? formatDateWithSuffix(user.registration_date) : 'N/A';
+        document.getElementById('institution').textContent = user.institution || 'N/A';
+        userRole=user.userRole;
+        role = user.role;
+        currentUser = user.currentUser;
+        userId = user.user_id;
+        score_hidden = user.score_hidden;
+
+        const extra1 = document.getElementById('extra-field-1');
+        const extra2 = document.getElementById('extra-field-2');
+        const examTitle = document.getElementById('exam-title');
+        const examList = document.getElementById('exam-list');
+        examList.innerHTML = '';
+
+        let accuracy = 'N/A';
+        if (user.accuracy !== null && user.accuracy !== undefined) {
+          accuracy = user.accuracy + '%';
+        }
+
+        const createExamItem = (exam, showScore = false) => {
+          const li = document.createElement('li');
+          const showScoreText = (score_hidden && currentUser !== userId) ? '<em>Score is hidden by this user</em>' : `<em>Score: ${exam.score}/${exam.total}</em>`;
+          li.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <span>${exam.title}</span> — ${showScore ? showScoreText : `<em>${exam.participants} participants</em>`}
+              </div>
+              <a href="/exam-details/${exam.exam_id}?from=profile&id=${exam.exam_id}&username=${username}" class="details-btn">View Details</a>
+            </div>`;
+          return li;
+        };
+
+        if (user.role.toLowerCase() === 'teacher') {
+          extra1.innerHTML = `<strong>Total Exam Created:</strong> ${user.total_exam_created || 0}`;
+          extra2.style.display = 'none';
+          examTitle.textContent = 'Created Exams';
+
+          if (user.created_exams && user.created_exams.length > 0) {
+            user.created_exams.forEach(exam => {
+              examList.appendChild(createExamItem(exam));
+            });
+          } else {
+            examList.innerHTML = `<li><em>No created exams found.</em></li>`;
+          }
+
+        } else if (user.role.toLowerCase() === 'student') {
+          extra1.innerHTML = `<strong>Total Exam Attempted:</strong> ${user.total_exam_participated || 0}`;
+          extra2.innerHTML = `<strong>Student Accuracy:</strong> ${accuracy}`;
+          examTitle.textContent = 'Attempted Exams';
+
+          if (currentUser === userId) {
+            toggleBtn.style.display = 'inline-block';
+            toggleBtn.textContent = score_hidden ? 'Show Your Score to Others' : 'Hide Your Score to Others';
+
+            toggleBtn.onclick = () => {
+              const newStatus = !score_hidden;
+              fetch('/api/students/toggle-score-visibility', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, score_hidden: newStatus })
+              })
+                .then(res => {
+                  if (!res.ok) throw new Error('Failed to update');
+                  return res.json();
+                })
+                .then(data => {
+                  score_hidden = newStatus;
+                  toggleBtn.textContent = score_hidden ? 'Show Your Score to Others' : 'Hide Your Score to Others';
+                  alert(data.message || 'Visibility updated');
+                  location.reload();
+                })
+                .catch(err => {
+                  console.error(err);
+                  alert('Failed to toggle score visibility');
+                });
+            };
+          }
+
+          if (user.attempted_exams && user.attempted_exams.length > 0) {
+            user.attempted_exams.forEach(exam => {
+              examList.appendChild(createExamItem(exam, true));
+            });
+          } else {
+            examList.innerHTML = `<li><em>No attempted exams found.</em></li>`;
+          }
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load user:', err);
+        alert('Failed to load profile data.');
+      });
+
+    const modal = document.getElementById("img-modal");
+    const img = document.getElementById("profile-pic");
+    const modalImg = document.getElementById("enlarged-pic");
+    const closeBtn = document.querySelector(".close");
+
+    img.onclick = function () {
+      modal.style.display = "block";
+      modalImg.src = this.src;
+    };
+    closeBtn.onclick = function () {
+      modal.style.display = "none";
+    };
+    window.onclick = function (e) {
+      if (e.target == modal) {
+        modal.style.display = "none";
+      }
+    };
+
+    function formatDateWithSuffix(dateString) {
+      const date = new Date(dateString);
+      if (isNaN(date)) return 'Invalid Date';
+      const day = date.getDate();
+      const suffix = day % 10 === 1 && day !== 11 ? 'st' :
+        day % 10 === 2 && day !== 12 ? 'nd' :
+          day % 10 === 3 && day !== 13 ? 'rd' : 'th';
+      const options = { month: 'long', year: 'numeric' };
+      const formatted = date.toLocaleDateString('en-US', options);
+      return `${day}${suffix} ${formatted}`;
+    }
+
+    function goBack() {
+      window.location.href = `/${userRole}/dashboard`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Exam Details</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 40px 20px;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        h1 {
+            font-weight: 800;
+            margin-bottom: 20px;
+            font-size: 2.4rem;
+            color: #4a148c;
+            text-align: center;
+        }
+
+        .info-row {
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .label {
+            font-weight: 700;
+            color: #666;
+            font-size: 1.1rem;
+            flex-basis: 40%;
+        }
+
+        .value {
+            font-size: 1.15rem;
+            color: #222;
+            flex-basis: 60%;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        #teacher-name {
+            color: #5e35b1;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        #teacher-name:hover {
+            color: #311b92;
+            text-shadow: 0 0 8px #7e57c2;
+        }
+
+        .password-protected {
+            font-weight: 700;
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .loading,
+        .error {
+            font-size: 1.25rem;
+            color: #ddd;
+            margin-top: 120px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .error {
+            color: #ffcdd2;
+            background-color: #b71c1c;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 0 15px #b71c1caa;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .container {
+                padding: 28px 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .label,
+            .value {
+                font-size: 1rem;
+            }
+
+            .info-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .value {
+                text-align: left;
+                margin-top: 6px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button onclick="goBackToDashboard()" style="
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #4a148c;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  ">← Go Back</button>
+
+    <div class="container" id="exam-container" style="display:none;">
+        <h1 id="exam-title">Loading...</h1>
+
+        <div class="info-row">
+            <span class="label">Teacher:</span>
+            <a href="#" id="teacher-name" target="_blank">...</a>
+        </div>
+
+        <div class="info-row">
+            <span class="label">Level:</span>
+            <span class="value" id="level">-</span>
+        </div>
+
+        <div class="info-row" id="exam-type-row" style="display:none;">
+            <span class="label">Exam Type:</span>
+            <span class="value" id="exam-type">-</span>
+        </div>
+
+        <div class="info-row" id="subject-row" style="display:none;">
+            <span class="label">Subject:</span>
+            <span class="value" id="subject">-</span>
+        </div>
+
+        <div class="info-row" id="paper-row" style="display:none;">
+            <span class="label">Paper:</span>
+            <span class="value" id="paper">-</span>
+        </div>
+
+        <div class="info-row" id="chapter-row" style="display:none;">
+            <span class="label">Chapter:</span>
+            <span class="value" id="chapter">-</span>
+        </div>
+
+        <div class="info-row">
+            <span class="label">Total Questions:</span>
+            <span class="value" id="total-questions">-</span>
+        </div>
+
+        <div class="info-row">
+            <span class="label">Total Marks:</span>
+            <span class="value" id="total-marks">-</span>
+        </div>
+
+        <div class="info-row">
+            <span class="label">Start Time:</span>
+            <span class="value" id="start-time">-</span>
+        </div>
+
+        <div class="info-row">
+            <span class="label">End Time:</span>
+            <span class="value" id="end-time">-</span>
+        </div>
+
+        <div class="info-row">
+            <span class="label">Password Protected:</span>
+            <span class="value" id="password-protected">No</span>
+        </div>
+    </div>
+
+    <div class="loading" id="loading-text">Loading exam details...</div>
+    <div class="error" id="error-text" style="display:none;"></div>
+
+    <script>
+        function formatDateTime(dateString) {
+            if (!dateString) return '-';
+            const dt = new Date(dateString);
+            return dt.toLocaleString(undefined, {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            });
+        }
+
+        async function goBackToDashboard() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            const examId = params.get('id');
+            const username = params.get('username');
+
+            if (from === 'profile' && examId && username) {
+                window.location.href = `/profile/${encodeURIComponent(username)}?id=${examId}`;
+            } else if (from === 'dashboard') {
+                try {
+                    const res = await fetch('/api/me');
+                    const data = await res.json();
+                    const role = data.role;
+                    window.location.href = `/${role}/dashboard`;
+                } catch {
+                    window.location.href = '/dashboard';
+                }
+            } else {
+                window.history.back(); // fallback
+            }
+        }
+
+        function getExamIdFromURL() {
+            const path = window.location.pathname.split('/');
+            return path[path.length - 1];
+        }
+
+        async function fetchExamDetails(id) {
+            const res = await fetch(`/api/exam-details/${id}`);
+            if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
+            return await res.json();
+        }
+
+        function showExamDetails(data) {
+            document.getElementById('exam-title').textContent = data.title || 'Untitled Exam';
+            const tname = document.getElementById('teacher-name');
+            tname.textContent = data.teacher_name || 'Unknown';
+            if (data.username) tname.href = `/profile/${encodeURIComponent(data.username)}?id=${data.examId}`;
+            else tname.removeAttribute('href');
+
+            document.getElementById('level').textContent = data.level || '-';
+            document.getElementById('start-time').textContent = formatDateTime(data.start_time);
+            document.getElementById('end-time').textContent = formatDateTime(data.end_time);
+            document.getElementById('total-questions').textContent = data.total_questions ?? '-';
+            document.getElementById('total-marks').textContent = data.total_marks ?? '-';
+
+            if (data.exam_type && data.exam_type !== 'Others') {
+                document.getElementById('exam-type').textContent = data.exam_type;
+                document.getElementById('exam-type-row').style.display = 'flex';
+            }
+
+            if (data.subject) {
+                document.getElementById('subject').textContent = data.subject;
+                document.getElementById('subject-row').style.display = 'flex';
+            }
+
+            if (data.paper) {
+                document.getElementById('paper').textContent = data.paper;
+                document.getElementById('paper-row').style.display = 'flex';
+            }
+
+            if (data.chapter) {
+                document.getElementById('chapter').textContent = data.chapter;
+                document.getElementById('chapter-row').style.display = 'flex';
+            }
+
+            const pwd = document.getElementById('password-protected');
+            if (data.password && data.password.trim() !== '') {
+                pwd.textContent = 'Yes';
+                pwd.classList.add('password-protected');
+            } else {
+                pwd.textContent = 'No';
+                pwd.classList.remove('password-protected');
+            }
+
+            document.getElementById('loading-text').style.display = 'none';
+            document.getElementById('exam-container').style.display = 'block';
+        }
+
+        function showError(msg) {
+            document.getElementById('loading-text').style.display = 'none';
+            const err = document.getElementById('error-text');
+            err.textContent = msg;
+            err.style.display = 'block';
+        }
+
+        (async () => {
+            const examId = getExamIdFromURL();
+            if (!examId) return showError('Missing exam ID in URL.');
+            try {
+                const data = await fetchExamDetails(examId);
+                showExamDetails(data);
+            } catch (err) {
+                showError(`Failed to load exam details. ${err.message}`);
+            }
+        })();
+    </script>
+</body>
+
+</html>

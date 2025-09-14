@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Set Question</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #bbdefb, #e3f2fd);
+      padding: 30px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #0d47a1;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    input[type="file"] {
+      margin-top: 5px;
+    }
+
+    .option {
+      margin-bottom: 15px;
+      background: #f1f8ff;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .btn {
+      background: #1976d2;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #1565c0;
+    }
+
+    h3 {
+      color: #0d47a1;
+    }
+
+    .top-buttons {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+    }
+
+    .top-buttons button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 16px 30px;
+      margin-left: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .top-buttons button:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2 id="examHeader">Set Questions for Exam ID:</h2>
+    <div class="top-buttons">
+      <button id="btnSuggestion">Question Suggestion</button>
+    </div>
+    <form id="questionForm" method="POST" enctype="multipart/form-data">
+      <label>Question Type:</label>
+      <select id="questionType" name="questionType" onchange="toggleQuestionInput()">
+        <option value="text">Text</option>
+        <option value="image">Image</option>
+      </select>
+
+      <div id="questionTextInput">
+        <label>Question (Text):</label>
+        <textarea name="questionText"></textarea>
+      </div>
+
+      <div id="questionImageInput" style="display:none;">
+        <label>Upload Question Image:</label>
+        <input type="file" name="questionImage">
+      </div>
+
+      <label>Marks:</label>
+      <input type="number" name="marks" min="1" required>
+
+      <!-- Hidden inputs for state preservation -->
+      <input type="hidden" id="paper" name="paper">
+      <input type="hidden" name="level" id="levelInput">
+      <input type="hidden" name="examType" id="examTypeInput">
+      <input type="hidden" name="subject" id="subjectInput">
+
+      <label>Chapter:</label>
+      <select id="chapterSelect" name="chapter">
+        <option value="">Select chapter</option>
+      </select>
+
+      <hr>
+      <div id="optionsContainer">
+        <h3>Options:</h3>
+      </div>
+      <button type="button" class="btn" onclick="addOption()">Add Option</button>
+      <br><br>
+      <button type="submit" class="btn">Add This Question</button>
+      <button type="button" class="btn" style="background: green;" onclick="finishExam()">Create Exam</button>
+    </form>
+  </div>
+
+  <script>
+    let optionCount = 0;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const examId = urlParams.get("exam_id");
+    const subject = urlParams.get("subject");
+    const examType = urlParams.get("examType");
+    const level = urlParams.get("level");
+    const selectedChapter = urlParams.get("chapter");
+    const paper = urlParams.get("paper");
+    document.getElementById("examHeader").textContent = `Set Questions for Exam ID: ${examId}`;
+    document.getElementById("questionForm").action = `/set-question/${examId}`;
+    document.getElementById("paper").value = paper;
+    document.getElementById("levelInput").value = level;
+    document.getElementById("examTypeInput").value = examType;
+    document.getElementById("subjectInput").value = subject;
+    const chapterSelect = document.getElementById("chapterSelect");
+    document.getElementById("questionForm").addEventListener("submit", () => {
+      if (chapterSelect.disabled) {
+        // Use selectedChapter from URL
+        chapterSelect.disabled = false; // re-enable it so it submits
+        chapterSelect.innerHTML = `<option selected value="${selectedChapter}">${selectedChapter}</option>`;
+      }
+    });
+
+    const chapterData = {
+      HSC: {
+        Physics: {
+          "1st": [
+            "Chapter-1: Physics World and Measurement",
+            "Chapter-2: Vector",
+            "Chapter-3: Dynamics",
+            "Chapter-4: Newtonian Mechanics",
+            "Chapter-5: Work, Energy and Power",
+            "Chapter-6: Gravitation and Gravity",
+            "Chapter-7: Structural Properties of Matter",
+            "Chapter-8: Periodic Motion",
+            "Chapter-9: Waves",
+            "Chapter-10: Ideal Gas and Kinetic Theory of Gases"
+          ],
+          "2nd": [
+            "Chapter-1: Thermodynamics",
+            "Chapter-2: Statical Electricity",
+            "Chapter-3: Current Electricity",
+            "Chapter-4: Magnetic Effects of Electric Current and Magnetism",
+            "Chapter-5: Electromagnetic Induction and Alternating Current",
+            "Chapter-6: Geometrical Optics",
+            "Chapter-7: Physical Optics",
+            "Chapter-8: Introduction to Modern Physics",
+            "Chapter-9: Atomic Model and Nuclear Physics",
+            "Chapter-10: Semiconductor and Electronics"
+          ]
+        },
+        Chemistry: {
+          "1st": [
+            "Chapter-1: Safe Use of Laboratory",
+            "Chapter-2: Qualitative Chemistry",
+            "Chapter-3: Periodic Properties and Chemical Bonding of Elements",
+            "Chapter-4: Chemical Changes",
+            "Chapter-5: Vocational Chemistry"
+          ],
+          "2nd": [
+            "Chapter-1: Environmental Chemistry",
+            "Chapter-2: Organic Chemistry",
+            "Chapter-3: Quantitative Chemistry",
+            "Chapter-4: Electrochemistry",
+            "Chapter-5: Economic Chemistry"
+          ]
+        },
+        Math: {
+          "1st": [
+            "Chapter-1: Matrices and Determinants",
+            "Chapter-2: Vector",
+            "Chapter-3: Straight Lines",
+            "Chapter-4: The Circle",
+            "Chapter-5: Permutations and Combinations",
+            "Chapter-6: Trigonometric Ratios",
+            "Chapter-7: Trigonometric Ratios of Associated Angles",
+            "Chapter-8: Functions and Graph of Functions",
+            "Chapter-9: Differentiations",
+            "Chapter-10: Integration"
+          ],
+          "2nd": [
+            "Chapter-1: Real Number and Inequalities",
+            "Chapter-2: Linear Programming",
+            "Chapter-3: Complex Number",
+            "Chapter-4: Polynomials and Polynomial Equations",
+            "Chapter-5: Binomial Expansions",
+            "Chapter-6: Conics",
+            "Chapter-7: Inverse Trigonometric Functions and Trigonometric Equations",
+            "Chapter-8: Statics",
+            "Chapter-9: Motion of Particles in a Plane",
+            "Chapter-10: Measures of Dispersions and Probability"
+          ]
+        },
+        Biology: {
+          "1st": [
+            "Chapter-1: Cell and Its Structure",
+            "Chapter-2: Cell Division",
+            "Chapter-3: Cell Chemistry",
+            "Chapter-4: Microorganisms",
+            "Chapter-5: Algae and Fungi",
+            "Chapter-6: Bryophyta and Pteridophyta",
+            "Chapter-7: Gymnosperms and Angiosperms",
+            "Chapter-8: Tissue and Tissue System",
+            "Chapter-9: Plant Physiology",
+            "Chapter-10: Reproduction of Plants"
+
+          ],
+          "2nd": [
+            "Chapter-1: Animal Diversity and Classification",
+            "Chapter-2: Animals Identity",
+            "Chapter-3: Human Physiology: Digestion and Absorption",
+            "Chapter-4: Human Physiology: Blood and Circulation",
+            "Chapter-5: Human Physiology: Respiratory Process and Respiration",
+            "Chapter-6: Human Physiology: Excretory Products and Excretion",
+
+            "Chapter-8: Human Physiology: Coordination and Control",
+            "Chapter-9: Continuance of Human Life",
+            "Chapter-10: Immunity of Human Body"
+          ]
+
+        },
+        ICT: [
+          "Chapter-1: Information and Communication Technology: World and Bangladesh Perspective",
+          "Chapter-2: Communication System and Networking",
+          "Chapter-3: Number Systems and Digital Device",
+          "Chapter-4: Introduction to Web Design and HTML",
+          "Chapter-5: Programming Language",
+          "Chapter-6: Database Management System"
+        ]
+      },
+      SSC: {
+        Physics: [
+          "Chapter-1: Physics World and Measurement",
+          "Chapter-2: Motion and its Laws",
+          "Chapter-3: Force and Momentum",
+          "Chapter-4: Work, Power, and Energy",
+          "Chapter-5: State of Matters and Pressure",
+          "Chapter-6: Heat and Temperature"
+        ],
+        Chemistry: [
+          "Chapter-1:Concept of Chemistry",
+          "Chapter-2:States of Matter",
+          "Chapter-3:Structure of Matter",
+          "Chapter-4:Periodic Table",
+          "Chapter-5:Chemical Bonds",
+          "Chapter-6:Concept of Mole and Chemical Calculations",
+          "Chapter-7:Chemical Reaction",
+          "Chapter-8:Chemistry and Energy",
+          "Chapter-9:Acid-Base Balance",
+          "Chapter-10:Mineral Resources: Metal-Nonmetal",
+          "Chapter-11:Mineral Resources-Fossil",
+          "Chapter-12:Chemistry in our Life"
+
+        ],
+        Math: [
+          "Chapter-1: Set and Function",
+          "Chapter-2: Algebraic Expression",
+          "Chapter-3: Geometry",
+          "Chapter-4: Geometric Constructions",
+          "Chapter-5: Equation",
+          "Chapter-6: Inequality",
+          "Chapter-7: Infinite Series",
+          "Chapter-8: Trigonometry",
+          "Chapter-9: Exponential and Logarithmic Function",
+          "Chapter-10: Binomial Expansion",
+          "Chapter-11: Coordinate Geometry",
+          "Chapter-12: Planar Vector",
+          "Chapter-13: Solid Geometry",
+          "Chapter-14: Probability"
+        ],
+        Biology: [
+          "Chapter-1: Lessons on Life",
+          "Chapter-2: Cells and Tissues of Organisms",
+          "Chapter-3: Cell Division",
+          "Chapter-4: Bioenergetics",
+          "Chapter-5: Food, Nutrition and Digestion",
+          "Chapter-6: Transport in Organisms",
+          "Chapter-7: Exchange of Gases",
+          "Chapter-8: Excretory System",
+          "Chapter-9: Firmness and Locomotion",
+          "Chapter-10: Co-ordination",
+          "Chapter-11: Reproduction in Organism",
+          "Chapter-12: Heredity in Organisms and Biological Evolution",
+          "Chapter-13: Environment of life",
+          "Chapter-14: Biotechnology"
+        ],
+        ICT: [
+          "Chapter-1: Information and Communication Technology and Our Bangladesh",
+          "Chapter-2: Computer and The Security of the User",
+          "Chapter-3: The Internet in My Education",
+          "Chapter-4: My Writing and Accounts",
+          "Chapter-5: Multimedia and Graphics",
+          "Chapter-6: The User of Database"
+
+        ]
+      }
+    };
+
+    function toggleQuestionInput() {
+      const type = document.getElementById('questionType').value;
+      document.getElementById('questionTextInput').style.display = type === 'text' ? 'block' : 'none';
+      document.getElementById('questionImageInput').style.display = type === 'image' ? 'block' : 'none';
+    }
+
+    function configureChapterField() {
+      if (level === "Others") {
+        chapterSelect.disabled = true;
+        return;
+      }
+
+      if (examType === "Chapterwise") {
+        chapterSelect.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = selectedChapter;
+        option.textContent = selectedChapter;
+        option.selected = true;
+        chapterSelect.appendChild(option);
+        chapterSelect.disabled = true;
+      } else if (examType === "Subjectwise") {
+        chapterSelect.innerHTML = '<option value="">Select chapter</option>';
+        let chapters = [];
+
+        if (level === 'HSC') {
+          if (Array.isArray(chapterData.HSC?.[subject])) {
+            chapters = chapterData.HSC[subject];
+          } else if (chapterData.HSC?.[subject]?.[paper]) {
+            chapters = chapterData.HSC[subject][paper];
+          }
+        } else if (level === 'SSC') {
+          if (Array.isArray(chapterData.SSC?.[subject])) {
+            chapters = chapterData.SSC[subject];
+          }
+        }
+
+        chapters.forEach(ch => {
+          const option = document.createElement("option");
+          option.value = ch;
+          option.textContent = ch;
+          chapterSelect.appendChild(option);
+        });
+      }
+    }
+
+    function addOption() {
+      optionCount++;
+      const container = document.getElementById('optionsContainer');
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.innerHTML = `
+        <label>Option ${optionCount} Type:</label>
+        <select name="optionType${optionCount}" onchange="toggleOptionInput(${optionCount})">
+          <option value="text">Text</option>
+          <option value="image">Image</option>
+        </select>
+        <div id="optionText${optionCount}">
+          <input type="text" name="optionText${optionCount}" placeholder="Option text" />
+        </div>
+        <div id="optionImage${optionCount}" style="display:none;">
+          <input type="file" name="optionImage${optionCount}" />
+        </div>
+        <label><input type="checkbox" name="correctOption" value="${optionCount}"> Correct</label>
+        <hr>
+      `;
+      container.appendChild(div);
+    }
+
+    function toggleOptionInput(index) {
+      const type = document.querySelector(`select[name='optionType${index}']`).value;
+      document.getElementById(`optionText${index}`).style.display = type === 'text' ? 'block' : 'none';
+      document.getElementById(`optionImage${index}`).style.display = type === 'image' ? 'block' : 'none';
+    }
+    const btnSuggestion = document.getElementById('btnSuggestion');
+    btnSuggestion.addEventListener('click', () => {
+      window.location.href = `/question-suggestion.html?exam_id=${examId}`;
+    });
+
+    function finishExam() {
+      fetch(`/finish-exam/${examId}`, {
+        method: 'POST'
+      }).then(res => {
+        if (res.ok) {
+          window.location.href = "/teacher/dashboard";
+        } else {
+          alert("Failed to finish exam. Please try again.");
+        }
+      });
+    }
+    window.onload = () => {
+      addOption();
+      configureChapterField();
+    };
+  </script>
+</body>
+
+</html>

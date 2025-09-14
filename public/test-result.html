@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Exam Result</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 30px;
+            background: #f9f9ff;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c2277;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .score {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c2277;
+            font-weight: 700;
+        }
+
+        .btn {
+            background-color: #2c2277;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 10px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #1f1a5a;
+        }
+
+        #answers-container {
+            margin-top: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .question {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+            margin-bottom: 20px;
+        }
+
+        .question p {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .option {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            cursor: default;
+            display: flex;
+            align-items: center;
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            font-weight: 700;
+        }
+
+        .option.wrong {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            font-weight: 700;
+        }
+
+        .option img {
+            max-height: 50px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Your Exam Result</h1>
+    <div class="score" id="score-display">Loading score...</div>
+    <div style="text-align:center;">
+        <button class="btn" id="view-answers-btn">View Your Answers</button>
+        <button class="btn" id="back-btn">Back to Leaderboard</button>
+    </div>
+
+    <div id="answers-container" style="display:none;"></div>
+
+    <script>
+        const urlParts = window.location.pathname.split('/');
+        const examId = urlParts[2];
+        const studentId = urlParts[4];
+
+        const scoreDisplay = document.getElementById('score-display');
+        const answersContainer = document.getElementById('answers-container');
+        const viewAnswersBtn = document.getElementById('view-answers-btn');
+        const backBtn = document.getElementById('back-btn');
+
+        let resultData = null;
+
+        async function fetchResult() {
+            try {
+                const res = await fetch(`/api/exam/${examId}/testResult/${studentId}`);
+                const data = await res.json();
+                resultData = data;
+                scoreDisplay.textContent = `Score: ${data.total_score} / ${data.total_marks}`;
+            } catch (err) {
+                scoreDisplay.textContent = 'Failed to load result.';
+                console.error(err);
+            }
+        }
+
+        function renderAnswers() {
+            answersContainer.innerHTML = '';
+            answersContainer.style.display = 'block';
+
+            resultData.questions.forEach((q, index) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+
+                let html = `<p><strong>Q${index + 1}:</strong> ${q.question_text || '<i>[Image question]</i>'}</p>`;
+                if (q.question_image) {
+                    html += `<img src="${q.question_image}" alt="Question Image" style="max-height:100px;">`;
+                }
+
+                const selected = q.selected_option_id;
+                const correctOptionIds = q.correct_option_ids;
+
+                q.options.forEach(o => {
+                    let classes = 'option';
+                    const isCorrect = correctOptionIds.includes(o.option_id);
+                    const isSelected = o.option_id === selected;
+
+                    if (selected === null || selected === undefined) {
+                        // Case 3: No option selected — do nothing
+                    } else if (isSelected && isCorrect) {
+                        // Case 1: Selected option is correct
+                        classes += ' correct';
+                    } else if (isSelected && !isCorrect) {
+                        // Case 2 & 4: Selected option is wrong
+                        classes += ' wrong';
+                    } else if (!isSelected && !selectedIsCorrect(selected, correctOptionIds) && isCorrect) {
+                        // Case 2: Show correct ones only if selected option was wrong
+                        classes += ' correct';
+                    }
+
+                    const content = o.option_image
+                        ? `<img src="${o.option_image}" alt="Option Image">`
+                        : o.option_text;
+
+                    html += `<div class="${classes}">${content}</div>`;
+                });
+
+                div.innerHTML = html;
+                answersContainer.appendChild(div);
+            });
+        }
+
+        function selectedIsCorrect(selectedOptionId, correctIds) {
+            return correctIds.includes(selectedOptionId);
+        }
+
+        viewAnswersBtn.addEventListener('click', () => {
+            renderAnswers();
+            viewAnswersBtn.disabled = true;
+        });
+
+        backBtn.addEventListener('click', () => {
+            window.location.href = `/exam/${examId}/studentLeaderboard`;
+        });
+
+        fetchResult();
+    </script>
+</body>
+
+</html>

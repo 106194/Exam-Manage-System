@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Student Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      color: #150101;
+    }
+
+    /* Navy mode */
+    body.navy-mode {
+      background-color:#1f1b2e;
+      color:white;
+    }
+
+    /* Header */
+    header {
+      background-color: #2839a7;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Header in navy-mode */
+    body.navy-mode header {
+      background-color: #ffffff !important; /* White header background */
+      color: #2839a7 !important; /* Dark navy text */
+    }
+
+    header h1 {
+      font-size: 24px;
+      user-select: none;
+    }
+
+    /* Header controls container */
+    .header-controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* Toggle Mode Button */
+    .toggle-mode-btn,
+    header a.logout-box {
+      border: 2px solid white;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+      text-decoration: none;
+      padding: 8px 14px;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      background-color: #2839a7;
+      color: white;
+    }
+
+    .toggle-mode-btn:hover {
+      background-color: white;
+      color: #2839a7;
+      border-color: white;
+    }
+
+    header a.logout-box {
+      background-color: transparent;
+      color: white;
+      border-color: white;
+    }
+
+    header a.logout-box:hover {
+      background-color: white;
+      color: #2839a7;
+      border-color: white;
+    }
+
+    /* Toggle and logout in navy-mode */
+    body.navy-mode .toggle-mode-btn {
+      border-color: #2839a7 !important;
+      color: white !important;
+      background-color: #2839a7 !important;
+    }
+
+    body.navy-mode .toggle-mode-btn:hover {
+      background-color: #1a237e !important;
+      border-color: #1a237e !important;
+      color: white !important;
+    }
+
+    body.navy-mode header a.logout-box {
+      color: #2839a7 !important;
+      border-color: #2839a7 !important;
+      background-color: transparent !important;
+    }
+
+    body.navy-mode header a.logout-box:hover {
+      background-color: #2839a7 !important;
+      color: white !important;
+      border-color: #2839a7 !important;
+    }
+
+    /* Container */
+    .container {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+
+    .sidebar {
+      width: 20%;
+      background-color: #e0e0e0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body.navy-mode .sidebar {
+      background-color: #1f1b2e;
+      color: white;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #150101;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 6px;
+      transition: color 0.4s ease, background-color 0.4s ease;
+    }
+
+    body.navy-mode .sidebar a {
+      color: white;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: white;
+    }
+
+    body.navy-mode .sidebar a:hover,
+    body.navy-mode .sidebar a.active {
+      background-color: #1f1b2e;
+      color: white;
+    }
+
+    .main {
+      max-width: 900px;
+      width: 100%;
+      background: #fff;
+      margin: 40px 20px 60px;
+      border-radius: 20px;
+      padding: 35px 40px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      color: #150101;
+    }
+
+    body.navy-mode .main {
+      background-color: #1f1b2e;
+      color: white;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .rightbar {
+      width: 20%;
+      background-color: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      color: #150101;
+    }
+
+    body.navy-mode .rightbar {
+      background-color: #1f1b2e;
+      color: white;
+    }
+
+    /* Profile Section */
+    .profile-section {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .profile-section img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #3928a7;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-section img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .profile-info h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #3928a7;
+      transition: color 0.4s ease;
+    }
+
+    body.navy-mode .profile-info h3 {
+      color: white;
+    }
+
+    .profile-info p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #444;
+      margin-bottom: 15px;
+      transition: color 0.4s ease;
+    }
+
+    body.navy-mode .profile-info p {
+      color: white;
+    }
+
+    /* Section Titles */
+    h3.section-title {
+      margin: 0 0 15px;
+      font-size: 22px;
+      color: #2e3c8c;
+      font-weight: 700;
+      border-bottom: 3px solid #3928a7;
+      padding-bottom: 6px;
+      max-width: max-content;
+      transition: color 0.4s ease, border-color 0.4s ease;
+    }
+
+    body.navy-mode h3.section-title {
+      color: white;
+      border-color: white;
+    }
+
+    /* Tabs container */
+    .tabs {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #ccc;
+      user-select: none;
+    }
+
+    .tab {
+      cursor: pointer;
+      padding: 10px 22px;
+      font-weight: 600;
+      color: #555;
+      border-radius: 8px 8px 0 0;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .tab:hover {
+      background-color: #d6f0d6;
+      color: #3928a7;
+    }
+
+    .tab.active {
+      background-color: #3928a7;
+      color: white;
+      box-shadow: 0 -4px 10px #3928a7;
+      border-bottom: 2px solid white;
+    }
+
+    /* Exams List */
+    .exam-list {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .exam-list.active {
+      display: flex;
+    }
+
+    .exam-card {
+      background: #f8f9fa;
+      padding: 18px 22px;
+      border-left: 6px solid #3928a7;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      transition: box-shadow 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .exam-card:hover {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .exam-card h4 {
+      margin: 0;
+      font-weight: 600;
+      color: #3928a7;
+      flex: 1 1 200px;
+    }
+
+    .exam-card p {
+      margin: 0 15px 0 0;
+      color: #555;
+      font-size: 15px;
+      flex: 0 0 auto;
+    }
+
+    .exam-card .button {
+      padding: 9px 18px;
+      font-size: 14px;
+      background-color: #3928a7;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .exam-card .button:hover {
+      background-color: #3928a7;
+    }
+
+    /* Search Section */
+    .search-section input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    .search-section button {
+      padding: 8px;
+      width: 100%;
+      background-color: #3928a7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-section button:hover {
+      background-color: #2e308a;
+    }
+
+    /* Modal Styles */
+    #image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    #modal-image {
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 6px solid white;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+      object-fit: contain;
+      margin-bottom: 18px;
+    }
+
+    #close-modal {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      color: white;
+      font-size: 45px;
+      cursor: pointer;
+      font-weight: 900;
+      user-select: none;
+      z-index: 1001;
+      transition: color 0.2s ease;
+    }
+
+    #close-modal:hover {
+      color: #3928a7;
+    }
+
+    #remove-pic {
+      background: #e53935;
+      border: none;
+      padding: 14px 28px;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 17px;
+      transition: background 0.3s ease;
+      z-index: 1001;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.7);
+    }
+
+    #remove-pic:hover {
+      background: #b71c1c;
+      box-shadow: 0 6px 16px rgba(183, 28, 28, 0.8);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .profile-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .profile-info {
+        min-width: 100%;
+      }
+
+      .exam-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .exam-card .button {
+        align-self: stretch;
+        width: 100%;
+        text-align: center;
+      }
+
+      .search form {
+        flex-direction: column;
+      }
+
+      .search button {
+        width: 100%;
+      }
+
+      .tabs {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Welcome, <span id="welcome-name">Student</span>!</h1>
+    <div class="header-controls">
+      <button class="toggle-mode-btn" onclick="toggleMode()">🌗 Toggle Mode</button>
+      <a href="#" class="logout-box" onclick="confirmLogout()">🔒 Logout</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <h3 style="font-size: 2em; color: blue;">🏠 Dashboard</h3>
+      <a href="/student/edit-profile">✏️ Edit Profile</a>
+      <a id="profile-link" href="#">👤 Profile Details</a>
+      <a href="#">📘 Instructions</a>
+      <a href="/developers">👨‍💻 Developers</a>
+    </div>
+    <div class="main">
+      <div class="profile-section">
+        <img id="profile-pic" src="/uploads/default.png" alt="Profile Picture" />
+        <div class="profile-info">
+          <h3 id="student-name">Student Name</h3>
+          <p><strong>Bio:</strong> <span id="student-bio">Your bio will appear here.</span></p>
+        </div>
+      </div>
+
+      <h3 class="section-title">Available Exams</h3>
+      <div class="tabs">
+        <div class="tab active" data-tab="upcoming">Upcoming Exams</div>
+        <div class="tab" data-tab="running">Running Exams</div>
+        <div class="tab" data-tab="past">Past Exams</div>
+      </div>
+
+      <div id="upcoming" class="exam-list active"></div>
+      <div id="running" class="exam-list"></div>
+      <div id="past" class="exam-list"></div>
+    </div>
+    <div class="rightbar">
+      <div class="search-section">
+        <label for="search">Search by Username</label>
+        <form id="search-form" action="/search-results" method="GET" onsubmit="return handleSearch(event)">
+          <input type="text" id="search" name="q" placeholder="🔍 Enter username" />
+          <button type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Enlarged Image -->
+  <div id="image-modal">
+    <span id="close-modal">&times;</span>
+    <img id="modal-image" src="" alt="Enlarged Profile Picture" />
+    <button id="remove-pic">Remove Profile Picture</button>
+  </div>
+
+  <script>
+    // Load student full name dynamically
+    function toggleMode() {
+      document.body.classList.toggle('navy-mode');
+    }
+    function fetchExams() {
+      fetch('/api/student-exams')
+        .then(res => res.json())
+        .then(data => {
+          const upcomingContainer = document.getElementById('upcoming');
+          const runningContainer = document.getElementById('running');
+          const pastContainer = document.getElementById('past');
+
+          upcomingContainer.innerHTML = '';
+          runningContainer.innerHTML = '';
+          pastContainer.innerHTML = '';
+
+          const formatDateTime = datetimeStr => {
+            if (!datetimeStr) return '-';
+            const d = new Date(datetimeStr);
+            return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+          };
+
+          function setCountdownTimer(timerId, startTime) {
+            const targetTime = new Date(startTime);
+            if (isNaN(targetTime.getTime())) {
+              const el = document.getElementById(timerId);
+              if (el) el.textContent = 'Invalid start time';
+              return;
+            }
+
+            const updateTimer = () => {
+              const now = new Date();
+              const diff = Math.floor((targetTime - now) / 1000);
+              const el = document.getElementById(timerId);
+              if (!el) return;
+
+              if (diff <= 0) {
+                el.textContent = 'Started';
+                clearInterval(interval);
+              } else {
+                const hours = Math.floor(diff / 3600).toString().padStart(2, '0');
+                const minutes = Math.floor((diff % 3600) / 60).toString().padStart(2, '0');
+                const seconds = (diff % 60).toString().padStart(2, '0');
+                el.textContent = `${hours}:${minutes}:${seconds}`;
+              }
+            };
+
+            updateTimer();
+            const interval = setInterval(updateTimer, 1000);
+          }
+
+          const createCard = (exam, status) => {
+            const div = document.createElement('div');
+            div.className = 'exam-card';
+
+            const icon = exam.protected ? '🔒' : '🌍';
+
+            let dateLabel;
+            if (status === 'running') {
+              dateLabel = `Ends: ${formatDateTime(exam.end_date)}`;
+            } else if (status === 'upcoming') {
+              if (exam.date) {
+                const timerId = `timer-${exam.id}`;
+                dateLabel = `<span>Starts in: <span id="${timerId}">Loading...</span></span>`;
+                setCountdownTimer(timerId, exam.date);
+              } else {
+                dateLabel = 'Start time not available';
+              }
+            } else {
+              dateLabel = `Date: ${formatDateTime(exam.date)}`;
+            }
+
+            let btnText, btnHref;
+            if (status === 'past') {
+              btnText = 'View Result';
+              btnHref = `/exam/${exam.id}/studentLeaderboard`;
+            } else if (status === 'running') {
+              btnText = 'Attempt Now';
+              btnHref = `/attempt-exam/${exam.id}`;
+            } else {
+              btnText = 'View Details';
+              btnHref = `/exam-details/${exam.id}`;
+            }
+
+            const teacherInfo = exam.teacher_name ? `<p><strong>Teacher:</strong> ${exam.teacher_name}</p>` : '';
+
+            div.innerHTML = `
+          <h4>${icon} ${exam.title}</h4>
+          ${teacherInfo}
+          <p>${dateLabel}</p>
+          <a href="${btnHref}" class="button">${btnText}</a>
+        `;
+
+            const button = div.querySelector('a.button');
+
+            if (exam.protected && status !== 'upcoming') {
+              button.addEventListener('click', e => {
+                e.preventDefault();
+                window.location.href = `/exam-password.html?exam_id=${exam.id}`;
+              });
+            }
+
+            return div;
+          };
+
+          data.upcoming.forEach(exam => upcomingContainer.appendChild(createCard(exam, 'upcoming')));
+          data.running.forEach(exam => runningContainer.appendChild(createCard(exam, 'running')));
+          data.past.forEach(exam => pastContainer.appendChild(createCard(exam, 'past')));
+
+          if (data.upcoming.length === 0) upcomingContainer.innerHTML = '<p style="color:#777;">No upcoming exams.</p>';
+          if (data.running.length === 0) runningContainer.innerHTML = '<p style="color:#777;">No running exams.</p>';
+          if (data.past.length === 0) pastContainer.innerHTML = '<p style="color:#777;">No past exams.</p>';
+        })
+        .catch(err => {
+          console.error('Failed to load exams:', err);
+          ['upcoming', 'running', 'past'].forEach(id => {
+            document.getElementById(id).innerHTML = '<p>Error loading exams.</p>';
+          });
+        });
+    }
+    fetchExams();
+    setInterval(fetchExams, 30000);
+
+    fetch('/api/current-user')
+      .then(res => res.json())
+      .then(data => {
+        const welcomeText = document.getElementById('welcome-name');
+        const bioText = document.getElementById('student-bio');
+        const image = document.getElementById('profile-pic');
+        const username = data.username;
+        document.getElementById('profile-link').href = `/profile/${username}`;
+        if (data.bio) {
+          bioText.textContent = data.bio;
+        }
+        if (data.name) {
+          welcomeText.textContent = `Welcome, ${data.name}!`;
+        }
+        if (data.profile_pic) {
+          image.src = data.profile_pic;
+        }
+        document.getElementById('student-name').textContent = data.name || 'Student';
+
+        // Optionally hide remove button if default pic is loaded
+        const removeBtn = document.getElementById('remove-pic');
+        if (!data.profile_pic || data.profile_pic === '/uploads/default.png') {
+          removeBtn.style.display = 'none';
+        } else {
+          removeBtn.style.display = 'inline-block';
+        }
+      })
+      .catch(err => {
+        console.error('Error loading student name:', err);
+      });
+
+    // Confirm logout
+    function confirmLogout() {
+      if (confirm("Are you sure you want to logout?")) {
+        window.location.href = "/logout";
+      }
+    }
+
+    // Profile picture modal functionality
+    const profilePic = document.getElementById('profile-pic');
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-image');
+    const closeModal = document.getElementById('close-modal');
+    const removeBtn = document.getElementById('remove-pic');
+
+    profilePic.addEventListener('click', () => {
+      modalImg.src = profilePic.src;
+      modal.style.display = 'flex';
+    });
+
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    function handleSearch(event) {
+      event.preventDefault(); // prevent actual form submit so you control redirect
+      const query = document.getElementById('search').value.trim();
+      if (query) {
+        window.location.href = '/search-results?q=' + encodeURIComponent(query);
+      }
+      return false;
+    }
+    removeBtn.addEventListener('click', () => {
+      if (confirm("Are you sure you want to remove your profile picture?")) {
+        fetch('/api/remove-profile-pic', {
+          method: 'POST'
+        })
+          .then(res => res.json())
+          .then(data => {
+            profilePic.src = data.profile_pic;
+            modalImg.src = data.profile_pic;
+            modal.style.display = 'none';
+            removeBtn.style.display = 'none';
+          })
+          .catch(err => {
+            alert("Error removing profile picture.");
+            console.error(err);
+          });
+      }
+    });
+
+    // Tab switching logic
+    const tabs = document.querySelectorAll('.tab');
+    const examLists = document.querySelectorAll('.exam-list');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active from all tabs and exam lists
+        tabs.forEach(t => t.classList.remove('active'));
+        examLists.forEach(list => list.classList.remove('active'));
+
+        // Add active to clicked tab and its linked list
+        tab.classList.add('active');
+        const targetId = tab.getAttribute('data-tab');
+        document.getElementById(targetId).classList.add('active');
+      });
+    });
+  </script>
+</body>
+
+</html>

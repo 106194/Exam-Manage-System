@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Question Suggestion</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4ff;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #0d47a1;
+        }
+
+        #questionsList {
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-text {
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .question-image {
+            max-width: 300px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .options-list {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 0;
+        }
+
+        .option-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-text {
+            font-size: 16px;
+        }
+
+        .option-image {
+            max-width: 120px;
+            margin-left: 12px;
+            border-radius: 4px;
+        }
+
+        button.add-btn {
+            margin-top: 12px;
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button.add-btn:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        #btnContainer {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        #btnManual,
+        #btnFinish {
+            margin: 0 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        #btnManual {
+            background-color: #388e3c;
+        }
+
+        #btnFinish {
+            background-color: #1976d2;
+        }
+
+        #btnManual:hover {
+            background-color: #2e7d32;
+        }
+
+        #btnFinish:hover {
+            background-color: #0d47a1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Question Suggestion</h1>
+    <div id="questionsList">Loading questions...</div>
+
+    <div id="btnContainer">
+        <button id="btnManual">Go to Manual Add</button>
+        <button id="btnFinish">Finish Exam</button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const examId = urlParams.get('exam_id');
+        const questionsListDiv = document.getElementById('questionsList');
+        let cart = [];
+
+        function fetchSuggestedQuestions() {
+            if (!examId) {
+                questionsListDiv.textContent = "Missing exam_id in URL.";
+                return;
+            }
+            fetch(`/api/questions/suggestion?exam_id=${examId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const questions = data.questions || [];
+                    if (questions.length === 0) {
+                        questionsListDiv.textContent = "No suggested questions found.";
+                        return;
+                    }
+                    renderQuestions(questions);
+                })
+                .catch(() => {
+                    questionsListDiv.textContent = 'Failed to load suggested questions.';
+                });
+        }
+
+        function renderQuestions(questions) {
+            questionsListDiv.innerHTML = '';
+            questions.forEach(q => {
+                const card = document.createElement('div');
+                card.className = 'question-card';
+
+                // Question Text
+                const qText = document.createElement('div');
+                qText.className = 'question-text';
+                qText.textContent = q.question_text;
+                card.appendChild(qText);
+
+                // Question Image (if any)
+                if (q.question_image) {
+                    const qImg = document.createElement('img');
+                    qImg.className = 'question-image';
+                    qImg.src = `${q.question_image}`;
+                    qImg.alt = "Question Image";
+                    card.appendChild(qImg);
+                }
+
+                // Options list
+                if (q.options.length > 0) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'options-list';
+
+                    q.options.forEach(opt => {
+                        const li = document.createElement('li');
+                        li.className = 'option-item';
+
+                        const optText = document.createElement('span');
+                        optText.className = 'option-text';
+                        optText.textContent = opt.option_text;
+                        li.appendChild(optText);
+
+                        if (opt.option_image) {
+                            const optImg = document.createElement('img');
+                            optImg.className = 'option-image';
+                            optImg.src = `${opt.option_image}`;
+                            optImg.alt = "Option Image";
+                            li.appendChild(optImg);
+                        }
+
+                        ul.appendChild(li);
+                    });
+
+                    card.appendChild(ul);
+                }
+
+                // Add Button
+                const addBtn = document.createElement('button');
+                addBtn.className = 'add-btn';
+                const alreadyAdded = cart.find(cq => cq.question_id === q.question_id);
+                addBtn.textContent = alreadyAdded ? "Added" : "Add";
+                addBtn.disabled = alreadyAdded;
+                addBtn.onclick = () => addToExam(q, addBtn);
+                card.appendChild(addBtn);
+
+                questionsListDiv.appendChild(card);
+            });
+        }
+
+        function addToExam(question, btn) {
+            fetch(`/question-suggestion/${examId}/${question.question_id}`, {
+                method: 'POST'
+            })
+                .then(res => {
+                    if (res.ok) {
+                        cart.push(question);
+                        btn.textContent = "Added";
+                        btn.disabled = true;
+                        alert("Question added to exam.");
+                    } else {
+                        alert("Failed to add question.");
+                    }
+                })
+                .catch(() => alert("Error adding question."));
+        }
+
+        document.getElementById('btnManual').addEventListener('click', () => {
+            window.location.href = `/set-question/${examId}`;
+        });
+        document.getElementById('btnFinish').addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert("Please add at least one question before finishing the exam.");
+                return;
+            }
+            fetch(`/finish-exam/${examId}`, {
+                method: 'POST'
+            }).then(res => {
+                if (res.ok) {
+                    window.location.href = "/teacher/dashboard";
+                } else {
+                    alert("Failed to finish exam. Please try again.");
+                }
+            });
+        });
+
+        fetchSuggestedQuestions();
+    </script>
+
+</body>
+
+</html>

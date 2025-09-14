@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Developers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #c2e9fb, #a1c4fd);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 30px;
+      text-decoration: none;
+      color: #fff;
+      background: #4b79a1;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .back-link:hover {
+      background: #355c7d;
+    }
+
+    .container {
+      display: flex;
+      gap: 60px;
+      justify-content: center;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+      width: 320px;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 20px;
+      border: 4px solid #a1c4fd;
+    }
+
+    .name {
+      font-size: 1.5em;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .degree {
+      font-size: 1.05em;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    .institution {
+      font-size: 1em;
+      color: #777;
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <form method="POST" action="/developers">
+    <button type="submit" class="back-link">← Back</button>
+  </form>
+  <div class="container">
+    <div class="card">
+      <img src="/uploads/fahim.jpg" alt="Developer 1" onerror="this.src='/uploads/default.png'">
+      <div class="name">Fahim Ahmed</div>
+      <div class="degree">Studies BSc. in Computer Science & Engineering</div>
+      <div class="institution">BUET</div>
+    </div>
+    <div class="card">
+      <img src="/uploads/default.png" alt="Developer 2">
+      <div class="name">Israt Nipa</div>
+      <div class="degree">Studies BSc. in Computer Science & Engineering</div>
+      <div class="institution">BUET</div>
+    </div>
+  </div>
+
+</body>
+
+</html>

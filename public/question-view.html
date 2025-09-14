@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Exam Questions Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #eef1fc, #f9f9ff);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background-color: #2c2277;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-btn i {
+      margin-right: 6px;
+    }
+
+    .back-btn:hover {
+      background-color: #1f1a5a;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c2277;
+      margin-bottom: 30px;
+    }
+
+    .question {
+      background: #ffffff;
+      border-left: 6px solid #2c2277;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .question-header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2c2277;
+      margin-bottom: 10px;
+    }
+
+    .chapter-name {
+      font-style: italic;
+      color: #666;
+      margin: 10px 0 15px;
+    }
+
+    .question-text img {
+      max-width: 100%;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .option-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .option-list li {
+      background: #f0f0ff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option-list li img {
+      max-height: 80px;
+      border-radius: 4px;
+    }
+
+    .option-list li.correct {
+      background-color: #e6f4ea;
+      border: 2px solid #4caf50;
+      color: #2e7d32;
+      font-weight: 600;
+    }
+
+    .option-list li.correct::before {
+      content: "\f00c";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      color: #4caf50;
+      margin-right: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .question {
+        padding: 15px;
+      }
+
+      .question-header {
+        font-size: 1rem;
+      }
+
+      .back-btn {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <a href="javascript:history.back()" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+    <h1><i class="fas fa-eye"></i> Exam Questions Viewer</h1>
+    <div id="questions-container">Loading questions...</div>
+  </div>
+
+  <script>
+    function formatContent(text, image) {
+      if (image) {
+        return `<img src="${image}" alt="Image content" />`;
+      }
+      return text ? text.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+    }
+
+    function renderQuestions(questions, options) {
+      if (questions.length === 0) {
+        return '<p>No questions found for this exam.</p>';
+      }
+
+      const optionsByQuestion = {};
+      options.forEach(opt => {
+        if (!optionsByQuestion[opt.question_id]) {
+          optionsByQuestion[opt.question_id] = [];
+        }
+        optionsByQuestion[opt.question_id].push(opt);
+      });
+
+      let html = '';
+      questions.forEach((q, idx) => {
+        let chapter_name = 'N/A';
+        if (q.chapter_id !== 'Others') {
+          chapter_name = q.chapter_id.slice(3);
+        }
+
+        html += `<div class="question">
+          <div class="question-header">Q${idx + 1}:</div>
+          <div class="question-text">${formatContent(q.text, q.image)}</div>
+          <div class="chapter-name">Source: ${chapter_name}</div>
+          <ul class="option-list">`;
+
+        const opts = optionsByQuestion[q.question_id] || [];
+        opts.forEach(opt => {
+          const classes = opt.is_correct ? 'correct' : '';
+          html += `<li class="${classes}">${formatContent(opt.text, opt.image)}</li>`;
+        });
+
+        html += `</ul></div>`;
+      });
+
+      return html;
+    }
+
+    async function fetchAndRender() {
+      const urlParts = window.location.pathname.split('/');
+      const examId = urlParts[2];
+      if (!examId) {
+        document.getElementById('questions-container').innerHTML = '<p>Error: No examId specified in URL.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/exam/${examId}/questions`);
+        if (!response.ok) throw new Error('Network response not OK');
+
+        const data = await response.json();
+        const html = renderQuestions(data.questions, data.options);
+        document.getElementById('questions-container').innerHTML = html;
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('questions-container').innerHTML = '<p>Error loading questions.</p>';
+      }
+    }
+
+    fetchAndRender();
+  </script>
+</body>
+
+</html>

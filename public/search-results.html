@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Search Results</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #ACB6E5);
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 800px;
+      background: white;
+      padding: 30px;
+      margin: auto;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    #search-query {
+      font-weight: bold;
+      color: #007bff;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+    a.username-link {
+      font-weight: bold;
+      color: #007bff;
+      text-decoration: none;
+    }
+    a.username-link:hover {
+      text-decoration: underline;
+    }
+    .no-results {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+      padding: 20px 0;
+    }
+    a.back {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      color: #007bff;
+      text-decoration: none;
+    }
+    a.back:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Search Results</h1>
+    <p>Search term: <span id="search-query"></span></p>
+    <ul id="results-list"></ul>
+    <a class="back" id="back-link" href="#">← Go back to Dashboard</a>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q') || '';
+    document.getElementById('search-query').textContent = query;
+
+    const list = document.getElementById('results-list');
+
+    if (!query.trim()) {
+      list.innerHTML = '<li class="no-results">Please enter a username to search.</li>';
+    } else {
+      fetch(`/api/search?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          list.innerHTML = '';
+
+          if (data.length === 0) {
+            list.innerHTML = '<li class="no-results">No users found.</li>';
+          } else {
+            data.forEach(user => {
+              const li = document.createElement('li');
+              const link = document.createElement('a');
+              link.href = `/profile/${user.username}`;
+              link.textContent = user.username;
+              link.className = 'username-link';
+              li.appendChild(link);
+              li.innerHTML += ` — ${user.Role}`;
+              list.appendChild(li);
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          list.innerHTML = '<li class="no-results">Error fetching results.</li>';
+        });
+    }
+
+    // Dynamically set back link based on user role
+    fetch('/api/current-user')
+      .then(res => res.json())
+      .then(data => {
+        const role = data.role?.toLowerCase();
+        const backLink = document.getElementById('back-link');
+        if (role === 'student') {
+          backLink.href = '/student/dashboard';
+        } else if (role === 'teacher') {
+          backLink.href = '/teacher/dashboard';
+        } else {
+          backLink.href = '/signin';
+        }
+      })
+      .catch(err => {
+        console.error('Error loading user role:', err);
+        document.getElementById('back-link').href = '/signin';
+      });
+  </script>
+</body>
+</html>

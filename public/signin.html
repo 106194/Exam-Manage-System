@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign In | ExamSys</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    :root {
+      --bg-dark: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      --bg-light: linear-gradient(135deg, #dbeafe, #eff6ff);
+      --box-dark: rgba(255, 255, 255, 0.08);
+      --box-light: #ffffff;
+      --text-light: #111;
+      --text-dark: #f5f5f5;
+      --primary-color: #00c6ff;
+      --primary-hover: #005ce6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      flex-direction: column;
+    }
+
+    body.light-mode {
+      background: var(--bg-light);
+      color: var(--text-light);
+    }
+
+    .signin-container {
+      background: var(--box-dark);
+      padding: 40px 35px;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 420px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn 0.5s ease;
+      position: relative;
+      transition: all 0.3s ease;
+      z-index: 1;
+    }
+
+    body.light-mode .signin-container {
+      background: var(--box-light);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      color: #00c6ff;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 8px;
+      background: #f3f3f3;
+      transition: 0.2s ease;
+      font-size: 15px;
+    }
+
+    .input-wrapper input:focus {
+      outline: 2px solid var(--primary-color);
+      background: #fff;
+    }
+
+    .password-toggle {
+      margin-top: 10px;
+      font-size: 0.88em;
+      cursor: pointer;
+      color: var(--primary-color);
+      font-weight: 500;
+      display: inline-block;
+      user-select: none;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: linear-gradient(to right, var(--primary-color), #0072ff);
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      margin-top: 10px;
+      color: var(--primary-color);
+    }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Fixed top-right toggle mode button */
+    .top-controls {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 10000;
+      user-select: none;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      border-radius: 8px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      font-weight: 600;
+      font-size: 0.9em;
+      line-height: 1.2;
+      font-family: 'Poppins', sans-serif;
+      white-space: nowrap;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 50%;
+      left: 15%;
+      transform: translateY(-50%);
+      z-index: 10;
+      /* Remove background, padding, box-shadow, border-radius */
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+      border-radius: 0;
+      width: auto;
+      height: auto;
+    }
+
+    .sidebar img {
+      display: block;
+      width: 260px;
+      /* or your preferred size */
+      height: auto;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .theme-toggle:hover {
+      background: rgba(0, 198, 255, 0.1);
+    }
+
+    /* Developed by link fixed bottom center */
+    .developed-link {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9em;
+      line-height: 1.2;
+      font-family: 'Poppins', sans-serif;
+      user-select: none;
+      white-space: nowrap;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(255 255 255 / 0.1);
+      transition: background 0.3s ease;
+      z-index: 10000;
+    }
+
+    .developed-link:hover {
+      background: rgba(255 255 255 / 0.25);
+      text-decoration: underline;
+    }
+
+    .admin-login-button {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9em;
+      padding: 8px 14px;
+      border-radius: 8px;
+      backdrop-filter: blur(6px);
+      transition: background 0.3s ease;
+      z-index: 10000;
+    }
+
+    .admin-login-button:hover {
+      background: rgba(255, 255, 255, 0.25);
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .signin-container {
+        padding: 30px 25px;
+      }
+
+      .top-controls {
+        top: 10px;
+        right: 10px;
+      }
+
+      .theme-toggle {
+        padding: 5px 8px;
+        font-size: 0.8em;
+      }
+
+      .developed-link {
+        bottom: 10px;
+        font-size: 0.8em;
+        padding: 5px 8px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-controls">
+    <button class="theme-toggle" onclick="toggleTheme()">🌗 Toggle Mode</button>
+  </div>
+  <div class="sidebar" aria-label="Sidebar illustration">
+    <img src="https://cdn-icons-png.flaticon.com/512/2910/2910765.png" alt="Exam Illustration" />
+  </div>
+
+  <div class="signin-container">
+    <h2>Sign In</h2>
+    <form method="POST" action="/signin">
+      <label for="identifier">Email or Username</label>
+      <div class="input-wrapper">
+        <input name="identifier" id="identifier" required />
+      </div>
+
+      <label for="password">Password</label>
+      <div class="input-wrapper">
+        <input name="password" id="password" type="password" required />
+      </div>
+
+      <div class="password-toggle" onclick="togglePassword()">Show Password</div>
+
+      <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+      <button type="submit">Sign In</button>
+    </form>
+
+    <p class="footer-text">Don't have an account? <a href="index.html">Sign Up</a></p>
+  </div>
+
+  <a href="developers.html" target="_blank" class="developed-link" title="Visit developer's page">Developed by</a>
+  <a href="adminlogin.html" class="admin-login-button" title="Admin Login">Sign in as Admin</a>
+  <script>
+    let isPasswordShown = false;
+
+    function togglePassword() {
+      const pwd = document.getElementById('password');
+      const toggle = document.querySelector('.password-toggle');
+      isPasswordShown = !isPasswordShown;
+
+      if (isPasswordShown) {
+        pwd.type = 'text';
+        toggle.textContent = 'Hide Password';
+      } else {
+        pwd.type = 'password';
+        toggle.textContent = 'Show Password';
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+    }
+  </script>
+</body>
+
+</html>

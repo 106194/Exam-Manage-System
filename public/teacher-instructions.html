@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Instructions</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f3fef4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #388e3c;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 30px;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    .back-button {
+      background-color: white;
+      color: #388e3c;
+      border: none;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .back-button:hover {
+      background-color: #d0e8d1;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 30px;
+    }
+
+    h2 {
+      color: #2e7d32;
+    }
+
+    h3 {
+      margin-top: 25px;
+      color: #333;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .policy {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 1px solid #bbb;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Teacher Instructions</h1>
+  <a href="/teacher-dashboard.html" class="back-button">Back to Dashboard</a>
+</header>
+
+<div class="container">
+  <h2>Create Exam</h2>
+  <p>
+    You can create an exam by choosing level (SSC/HSC/Others), subject, chapter, duration, and set whether it’s public or password-protected.
+    For the running exams, you can't see the update. After the exams have finished, you can see the leaderboard.
+    Be careful about selecting time (this must be consistent). Set at least one question for the exam; otherwise, the exam will be 
+    considered invalid and discarded.
+  </p>
+
+  <h3>Set Questions</h3>
+  <p>
+    After creating an exam, you will be redirected to the Set Question page. There, add each question and its options. Only one of text or image can be used per question/option.
+    You must select question or option type (image) to upload image files.
+    Be careful about uploading files. They must be images — preferably JPG or PNG.
+  </p>
+
+  <h3>Question Suggestion</h3>
+  <p>
+    Use previous exams or your own stored content as a reference. Ensure clarity, relevance, and fairness in question marks.
+    Be careful when adding questions from previous sources — they will be added with the same points and options 
+    which were set in the past by you or others.
+  </p>
+
+  <h3>Update Settings</h3>
+  <p>
+    You can edit your Full Name, Institution, Bio, and Profile Picture. You can reset your password using email verification if forgotten.
+    You can't change your username directly — contact the admin to request a username change.
+  </p>
+
+  <div class="policy">
+    <strong>Privacy & Policy:</strong> Uploaded questions and exam settings are private and stored securely. Don’t share protected exam credentials with unauthorized users.
+    Don't share your password or email with others for security reasons.
+  </div>
+</div>
+
+</body>
+</html>

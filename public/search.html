@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Results</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .back-button {
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .results {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 300px;
+      position: relative;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p {
+      margin: 4px 0;
+      color: #555;
+    }
+
+    .settings-btn {
+      background: #28a745;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    /* Settings Panel */
+    .settings-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 1000;
+    }
+
+    .settings-panel h3 {
+      margin-top: 0;
+    }
+
+    .settings-panel input[type="text"],
+    .settings-panel input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    .settings-panel .buttons {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .save-btn, .cancel-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .save-btn {
+      background: #007bff;
+      color: white;
+    }
+
+    .cancel-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    /* Overlay */
+    #overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+  <button class="back-button" onclick="goBack()">← Back</button>
+
+  <h2>Search Results</h2>
+  <div class="results" id="resultsContainer"></div>
+
+  <!-- Settings Panel -->
+  <div id="overlay"></div>
+  <div class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <h3 id="settingsTitle">Change User Settings</h3>
+    <form id="settingsForm">
+      <label for="settingUsername">Username</label>
+      <input type="text" id="settingUsername" name="username" required />
+
+      <label for="settingEmail">Email</label>
+      <input type="email" id="settingEmail" name="email" required />
+
+      <label>
+        <input type="checkbox" id="settingDeactivate" name="deactivate" />
+        Deactivate Account
+      </label>
+
+      <div class="buttons">
+        <button type="submit" class="save-btn">Save Changes</button>
+        <button type="button" class="cancel-btn" id="settingsCancelBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Back button with fallback
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/student-dashboard.html'; // Change to your default fallback
+      }
+    }
+
+    // Show settings panel
+    function openSettings(user) {
+      document.getElementById('settingUsername').value = user.username;
+      document.getElementById('settingEmail').value = user.email;
+      document.getElementById('settingDeactivate').checked = false;
+      document.getElementById('settingsPanel').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+
+    // Close settings panel
+    function closeSettings() {
+      document.getElementById('settingsPanel').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    document.getElementById('settingsCancelBtn').addEventListener('click', closeSettings);
+    document.getElementById('settingsForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Changes saved (simulate backend update)');
+      closeSettings();
+    });
+
+    // Load search results from query
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+
+    if (query) {
+      fetch(`/api/search?q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('resultsContainer');
+          if (data.length === 0) {
+            container.innerHTML = '<p>No results found.</p>';
+          } else {
+            data.forEach(user => {
+              const card = document.createElement('div');
+              card.className = 'card';
+              card.innerHTML = `
+                <h3>${user.Full_Name}</h3>
+                <p><strong>Username:</strong> ${user.username}</p>
+                <p><strong>Institution:</strong> ${user.Institution || 'N/A'}</p>
+                <p><strong>Role:</strong> ${user.Role}</p>
+                <button class="settings-btn" onclick='openSettings(${JSON.stringify(user)})'>Change Settings</button>
+              `;
+              container.appendChild(card);
+            });
+          }
+        })
+        .catch(err => {
+          console.error('Error loading search results:', err);
+          document.getElementById('resultsContainer').innerHTML = '<p>Error loading results.</p>';
+        });
+    }
+  </script>
+</body>
+</html>

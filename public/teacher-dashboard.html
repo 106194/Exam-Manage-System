@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Teacher Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      background-color: #2839a7;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 24px;
+    }
+
+    header a.logout {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    header a.logout:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      display: flex;
+      height: calc(100vh - 80px);
+    }
+
+    .sidebar {
+      width: 20%;
+      background-color: #e0e0e0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: #150101;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background-color: #d4edda;
+    }
+
+    .main {
+      width: 60%;
+      padding: 30px;
+      background-color: white;
+      overflow-y: auto;
+    }
+
+    .rightbar {
+      width: 20%;
+      background-color: #f5f5f5;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .search-section input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .search-section button {
+      padding: 8px;
+      width: 100%;
+      background-color: #3928a7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .search-section button:hover {
+      background-color: #3928a7;
+      color: white;
+      ;
+    }
+
+    .resources-container {
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    .resources-btn {
+      padding: 8px;
+      width: 100%;
+      background-color: #3928a7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    .resources-btn:hover {
+      background-color: #45a049;
+    }
+
+
+    .profile {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .profile img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #3928a7;
+      cursor: pointer;
+    }
+
+    .profile-info h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: #3928a7;
+    }
+
+    .profile-info p {
+      margin: 8px 0;
+    }
+
+    .button {
+      background-color: #3928a7;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .button:hover {
+      background-color: #3928a7;
+    }
+
+    .exams h3 {
+      color: #3928a7;
+      margin-bottom: 15px;
+    }
+
+    .exam-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .exam-tab-btn {
+      padding: 8px 15px;
+      background: white;
+      border: 2px solid #3928a7;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #3928a7;
+    }
+
+    .exam-tab-btn.active,
+    .exam-tab-btn:hover {
+      background-color: #3928a7;
+      color: white;
+    }
+
+    .exam-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .exam-card {
+      background: #f8f9fa;
+      padding: 15px;
+      border-left: 5px solid #3928a7;
+      border-radius: 8px;
+    }
+
+    .exam-card h4 {
+      margin: 0 0 8px 0;
+      color: #3928a7;
+    }
+
+    .view-details-btn {
+      background-color: #3928a7;
+      color: white;
+      padding: 6px 14px;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .view-details-btn:hover {
+      background-color: #3928a7;
+    }
+
+    .logout-box {
+      background-color: #ffffff;
+      color: #28a745;
+      border: 2px solid #28a745;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-box:hover {
+      background-color: #28a745;
+      color: white;
+      box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+    }
+
+
+    #image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #modal-image {
+      max-width: 90vw;
+      max-height: 80vh;
+      border: 6px solid white;
+      border-radius: 15px;
+    }
+
+    #close-modal {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 40px;
+      color: white;
+      cursor: pointer;
+    }
+
+    #remove-pic {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #e53935;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #remove-pic:hover {
+      background-color: #b71c1c;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Welcome, <span id="welcome-name">Teacher</span>!</h1>
+    <a href="#" class="logout-box" onclick="confirmLogout()">🔒Logout</a>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h3 style="font-size: 2em; color: blue;">🏠 Dashboard</h3>
+      <a href="/teacher/edit-profile">✏️ Edit Profile</a>
+      <a id="profile-link" href="#">👤 Profile Details</a>
+      <a href="/create-exam">📝 Create Exam</a>
+      <a href="/teacher-instructions.html">📘 Instructions</a>
+      <a href="/developers">👨‍💻Developers</a>
+      <a href="/contact-admin.html">📬Contact Admin</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="profile">
+        <img id="profile-pic" src="/uploads/default.png" alt="Profile Picture" />
+        <div class="profile-info">
+          <h2 id="teacher-name">Teacher Name</h2>
+          <p><strong>Bio:</strong> <span id="teacher-bio">Your bio will appear here.</span></p>
+        </div>
+      </div>
+
+      <div class="exams">
+        <h3>Available Exams</h3>
+
+        <div class="exam-tabs">
+          <button class="exam-tab-btn active" id="your-exams-btn">Your Exams</button>
+          <button class="exam-tab-btn" id="other-exams-btn">Other Exams</button>
+        </div>
+
+        <!-- Empty containers where JS will insert exam cards -->
+        <div id="your-exams" class="exam-list"></div>
+        <div id="other-exams" class="exam-list" style="display:none;"></div>
+      </div>
+
+    </div>
+    <div class="rightbar">
+      <div class="search-section">
+        <label for="search">Search by Username</label>
+        <form id="search-form" action="/search-results" method="GET" onsubmit="return handleSearch(event)">
+          <input type="text" id="search" name="q" placeholder="🔍 Enter username" />
+          <button type="submit">Search</button>
+        </form>
+      </div>
+      <div class="resources-container">
+        <button onclick="window.location.href='/resources'" class="resources-btn">📚 Resources</button>
+      </div>
+    </div>
+
+    <!-- Modal for image -->
+    <div id="image-modal">
+      <span id="close-modal">&times;</span>
+      <img id="modal-image" src="" alt="Enlarged Profile Picture" />
+      <button id="remove-pic">Remove Profile Picture</button>
+    </div>
+
+    <script>
+      function formatDateTime(datetimeStr) {
+        if (!datetimeStr) return '-';
+        const d = new Date(datetimeStr);
+        return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+      }
+
+      function createExamCard(exam, isOwner) {
+        const div = document.createElement('div');
+        div.className = 'exam-card';
+        const icon = exam.protected ? '🔒' : '🌍';
+        let html = `
+    <h4>${icon} ${exam.title}</h4>
+    <p>Duration: ${exam.duration} minutes</p>
+  `;
+
+        if (exam.ended) {
+          html += `<p>Ended on: ${formatDateTime(exam.end_date)}</p>`;
+        } else if (exam.start_date && new Date(exam.start_date) > new Date()) {
+          html += `<p>Starts on: ${formatDateTime(exam.start_date)}</p>`;
+        }
+        else {
+          html += `<p>Running....</p>`;
+        }
+
+        html += `<div>`;
+
+        html += `<a href="/exam-details/${exam.id}" class="view-details-btn">View Details</a>`;
+        if (!exam.ended) {
+          html += `<a href="/exam/${exam.id}/questions" class="button view-details-btn" style="margin-left:8px;"><i class="fas fa-list-ul"></i>View Questions</a>`;
+        }
+        if (exam.ended) {
+          html += `<a href="/exam/${exam.id}/leaderboard" class="button view-details-btn" style="margin-left:8px;">View Result</a>`;
+        }
+
+        html += `</div>`;
+
+        div.innerHTML = html;
+        const mainButton = div.querySelector('a.button');
+        if (exam.protected && mainButton && exam.current_id !== exam.user_id) {
+          mainButton.addEventListener('click', e => {
+            e.preventDefault();
+            window.location.href = `/exam-password.html?exam_id=${exam.id}`;
+          });
+        }
+        return div;
+      }
+
+      function fetchTeacherExams() {
+        fetch('/api/teacher-exams')
+          .then(res => res.json())
+          .then(data => {
+            const yourExamsContainer = document.getElementById('your-exams');
+            const otherExamsContainer = document.getElementById('other-exams');
+
+            yourExamsContainer.innerHTML = '';
+            otherExamsContainer.innerHTML = '';
+
+            if (data.yourExams.length === 0) {
+              yourExamsContainer.innerHTML = '<p style="color:#777;">No exams created by you.</p>';
+            } else {
+              data.yourExams.forEach(exam => {
+                const card = createExamCard(exam, true);
+                yourExamsContainer.appendChild(card);
+              });
+            }
+
+            if (data.otherExams.length === 0) {
+              otherExamsContainer.innerHTML = '<p style="color:#777;">No exams from other teachers.</p>';
+            } else {
+              data.otherExams.forEach(exam => {
+                const card = createExamCard(exam, false);
+                otherExamsContainer.appendChild(card);
+              });
+            }
+          })
+          .catch(err => {
+            console.error('Failed to load exams:', err);
+            ['your-exams', 'other-exams'].forEach(id => {
+              document.getElementById(id).innerHTML = '<p>Error loading exams.</p>';
+            });
+          });
+      }
+
+      // Call once initially and then refresh every 30 seconds
+      fetchTeacherExams();
+      setInterval(fetchTeacherExams, 30000);
+
+
+      fetch('/api/current-user')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('welcome-name').textContent = data.name || 'Teacher';
+          document.getElementById('teacher-name').textContent = data.name || 'Teacher Name';
+          document.getElementById('teacher-bio').textContent = data.bio || 'Your bio will appear here.';
+          document.getElementById('profile-pic').src = data.profile_pic || '/uploads/default.png';
+          document.getElementById('remove-pic').style.display =
+            !data.profile_pic || data.profile_pic === '/uploads/default.png' ? 'none' : 'inline-block';
+          const username = data.username;
+          document.getElementById('profile-link').href = `/profile/${username}`;
+        });
+
+      function confirmLogout() {
+        if (confirm("Are you sure you want to logout?")) {
+          window.location.href = "/logout";
+        }
+      }
+
+      const profilePic = document.getElementById('profile-pic');
+      const modal = document.getElementById('image-modal');
+      const modalImg = document.getElementById('modal-image');
+      const closeModal = document.getElementById('close-modal');
+      const removeBtn = document.getElementById('remove-pic');
+
+      profilePic.addEventListener('click', () => {
+        modalImg.src = profilePic.src;
+        modal.style.display = 'flex';
+      });
+
+      closeModal.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+      function handleSearch(event) {
+        event.preventDefault(); // prevent actual form submit so you control redirect
+        const query = document.getElementById('search').value.trim();
+        if (query) {
+          window.location.href = '/search-results?q=' + encodeURIComponent(query);
+        }
+        return false;
+      }
+
+
+      removeBtn.addEventListener('click', () => {
+        if (confirm("Are you sure you want to remove your profile picture?")) {
+          fetch('/api/remove-profile-pic', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+              profilePic.src = data.profile_pic;
+              modalImg.src = data.profile_pic;
+              modal.style.display = 'none';
+              removeBtn.style.display = 'none';
+            });
+        }
+      });
+
+      document.getElementById('your-exams-btn').addEventListener('click', () => {
+        document.getElementById('your-exams-btn').classList.add('active');
+        document.getElementById('other-exams-btn').classList.remove('active');
+        document.getElementById('your-exams').style.display = 'grid';
+        document.getElementById('other-exams').style.display = 'none';
+      });
+
+      document.getElementById('other-exams-btn').addEventListener('click', () => {
+        document.getElementById('other-exams-btn').classList.add('active');
+        document.getElementById('your-exams-btn').classList.remove('active');
+        document.getElementById('your-exams').style.display = 'none';
+        document.getElementById('other-exams').style.display = 'grid';
+      });
+    </script>
+</body>
+
+</html>

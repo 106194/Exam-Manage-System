@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Google Font */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #74ebd5, #9face6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .signup-container {
+      background: white;
+      padding: 30px 35px;
+      border-radius: 15px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 450px;
+      transition: 0.3s ease;
+    }
+
+    .signup-container:hover {
+      transform: translateY(-5px);
+    }
+
+    h2 {
+      text-align: center;
+      color: #4a4a4a;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 10px;
+      display: block;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+      transition: 0.2s ease;
+    }
+
+    input:focus {
+      border-color: #6c63ff;
+      background: #fff;
+      outline: none;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: #6c63ff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background: #5a52e8;
+      transform: scale(1.02);
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    @media (max-width: 480px) {
+      .signup-container {
+        padding: 25px 20px;
+      }
+    }
+
+    /* Email overlay */
+    #emailOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      backdrop-filter: blur(3px);
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-container">
+    <h2 id="title">Sign Up</h2>
+    <form id="signupForm" method="POST" action="/signup">
+      <input type="hidden" name="role" id="roleInput">
+
+      <label for="full_name">Full Name</label>
+      <input name="full_name" id="full_name" required>
+
+      <label for="username">Username</label>
+      <input name="username" id="username" required>
+
+      <label for="email">Email</label>
+      <input name="email" id="email" type="email" required>
+
+      <label for="password">Password</label>
+      <input name="password" id="password" type="password" required>
+
+      <label for="institution">Institution</label>
+      <input name="institution" id="institution">
+
+      <label for="phone">Phone</label>
+      <input name="phone" id="phone">
+
+      <button type="submit">Create Account</button>
+    </form>
+    <p class="footer-text">Already have an account? <a href="/signin" style="color:#6c63ff;">Login here</a></p>
+  </div>
+
+  <!-- Overlay shown while sending email -->
+  <div id="emailOverlay">
+    ⏳ Please wait, an email is being sent to this user...
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    if (!role || (role !== 'student' && role !== 'teacher')) {
+      alert('Invalid role');
+      window.location.href = '/';
+    }
+    document.getElementById('title').innerText += ` as ${role}`;
+    document.getElementById('roleInput').value = role;
+
+    const signupForm = document.getElementById('signupForm');
+    const emailOverlay = document.getElementById('emailOverlay');
+
+    signupForm.onsubmit = async (e) => {
+      e.preventDefault();
+
+      emailOverlay.style.display = 'flex'; // Show loading overlay
+
+      try {
+        const formData = new FormData(signupForm);
+        const res = await fetch('/signup', {
+          method: 'POST',
+          body: formData
+        });
+
+        const html = await res.text();
+
+        emailOverlay.style.display = 'none'; // hide overlay before replacing content
+
+        // Replace current page with server response
+        document.open();
+        document.write(html);
+        document.close();
+      } catch (err) {
+        emailOverlay.style.display = 'none';
+        alert('Signup failed. Please try again.');
+        console.error(err);
+      }
+    };
+  </script>
+</body>
+</html>

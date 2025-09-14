@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Exam</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #bbdefb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    form {
+      background-color: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #0d47a1;
+    }
+
+    select,
+    input[type="text"],
+    input[type="datetime-local"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: border 0.2s;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: #1976d2;
+      outline: none;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      width: 100%;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0d47a1;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="examForm" method="POST">
+    <h1>Create Exam</h1>
+
+    <label>Exam Title:
+      <input type="text" name="examTitle" required>
+    </label>
+
+    <label>Level:
+      <select id="level" name="level" required>
+        <option value="">Select level</option>
+        <option value="HSC">HSC</option>
+        <option value="SSC">SSC</option>
+        <option value="Others">Others</option>
+      </select>
+    </label>
+
+    <label>Exam Type:
+      <select id="examType" name="examType" required>
+        <option value="">Select type</option>
+        <option value="Subjectwise">Subjectwise</option>
+        <option value="Chapterwise">Chapterwise</option>
+      </select>
+    </label>
+
+    <label>Subject:
+      <select id="subject" name="subject" required>
+        <option value="">Select subject</option>
+        <option>Physics</option>
+        <option>Chemistry</option>
+        <option>Math</option>
+        <option>Biology</option>
+        <option>ICT</option>
+        <option>Others</option>
+      </select>
+    </label>
+
+    <label>Paper:
+      <select id="paper" name="paper">
+        <option value="">Select paper</option>
+        <option value="1st">1st</option>
+        <option value="2nd">2nd</option>
+      </select>
+    </label>
+
+    <label>Chapter:
+      <select id="chapter" name="chapter">
+        <option value="">Select chapter</option>
+      </select>
+    </label>
+
+    <label>Password (optional):
+      <input type="text" name="password">
+    </label>
+
+    <label>Start Time:
+      <input type="datetime-local" id="startTime" name="startTime" required>
+    </label>
+
+    <label>End Time:
+      <input type="datetime-local" id="endTime" name="endTime" required>
+    </label>
+
+    <button type="submit">Set Questions</button>
+  </form>
+
+  <script>
+    const level = document.getElementById('level');
+    const examType = document.getElementById('examType');
+    const subject = document.getElementById('subject');
+    const paper = document.getElementById('paper');
+    const chapter = document.getElementById('chapter');
+
+    const chapterData = {
+      HSC: {
+        Physics: {
+          "1st": [
+            "Chapter-1: Physics World and Measurement",
+            "Chapter-2: Vector",
+            "Chapter-3: Dynamics",
+            "Chapter-4: Newtonian Mechanics",
+            "Chapter-5: Work, Energy and Power",
+            "Chapter-6: Gravitation and Gravity",
+            "Chapter-7: Structural Properties of Matter",
+            "Chapter-8: Periodic Motion",
+            "Chapter-9: Waves",
+            "Chapter-10: Ideal Gas and Kinetic Theory of Gases"
+          ],
+          "2nd": [
+            "Chapter-1: Thermodynamics",
+            "Chapter-2: Statical Electricity",
+            "Chapter-3: Current Electricity",
+            "Chapter-4: Magnetic Effects of Electric Current and Magnetism",
+            "Chapter-5: Electromagnetic Induction and Alternating Current",
+            "Chapter-6: Geometrical Optics",
+            "Chapter-7: Physical Optics",
+            "Chapter-8: Introduction to Modern Physics",
+            "Chapter-9: Atomic Model and Nuclear Physics",
+            "Chapter-10: Semiconductor and Electronics"
+          ]
+        },
+        Chemistry: {
+          "1st": [
+            "Chapter-1: Safe Use of Laboratory",
+            "Chapter-2: Qualitative Chemistry",
+            "Chapter-3: Periodic Properties and Chemical Bonding of Elements",
+            "Chapter-4: Chemical Changes",
+            "Chapter-5: Vocational Chemistry"
+          ],
+          "2nd": [
+            "Chapter-1: Environmental Chemistry",
+            "Chapter-2: Organic Chemistry",
+            "Chapter-3: Quantitative Chemistry",
+            "Chapter-4: Electrochemistry",
+            "Chapter-5: Economic Chemistry"
+          ]
+        },
+        Math: {
+          "1st": [
+            "Chapter-1: Matrices and Determinants",
+            "Chapter-2: Vector",
+            "Chapter-3: Straight Lines",
+            "Chapter-4: The Circle",
+            "Chapter-5: Permutations and Combinations",
+            "Chapter-6: Trigonometric Ratios",
+            "Chapter-7: Trigonometric Ratios of Associated Angles",
+            "Chapter-8: Functions and Graph of Functions",
+            "Chapter-9: Differentiations",
+            "Chapter-10: Integration"
+          ],
+          "2nd": [
+            "Chapter-1: Real Number and Inequalities",
+            "Chapter-2: Linear Programming",
+            "Chapter-3: Complex Number",
+            "Chapter-4: Polynomials and Polynomial Equations",
+            "Chapter-5: Binomial Expansions",
+            "Chapter-6: Conics",
+            "Chapter-7: Inverse Trigonometric Functions and Trigonometric Equations",
+            "Chapter-8: Statics",
+            "Chapter-9: Motion of Particles in a Plane",
+            "Chapter-10: Measures of Dispersions and Probability"
+          ]
+        },
+        Biology: {
+          "1st": [
+            "Chapter-1: Cell and Its Structure",
+            "Chapter-2: Cell Division",
+            "Chapter-3: Cell Chemistry",
+            "Chapter-4: Microorganisms",
+            "Chapter-5: Algae and Fungi",
+            "Chapter-6: Bryophyta and Pteridophyta",
+            "Chapter-7: Gymnosperms and Angiosperms",
+            "Chapter-8: Tissue and Tissue System",
+            "Chapter-9: Plant Physiology",
+            "Chapter-10: Reproduction of Plants"
+
+          ],
+          "2nd": [
+            "Chapter-1: Animal Diversity and Classification",
+            "Chapter-2: Animals Identity",
+            "Chapter-3: Human Physiology: Digestion and Absorption",
+            "Chapter-4: Human Physiology: Blood and Circulation",
+            "Chapter-5: Human Physiology: Respiratory Process and Respiration",
+            "Chapter-6: Human Physiology: Excretory Products and Excretion",
+
+            "Chapter-8: Human Physiology: Coordination and Control",
+            "Chapter-9: Continuance of Human Life",
+            "Chapter-10: Immunity of Human Body"
+          ]
+
+        },
+        ICT: [
+          "Chapter-1: Information and Communication Technology: World and Bangladesh Perspective",
+          "Chapter-2: Communication System and Networking",
+          "Chapter-3: Number Systems and Digital Device",
+          "Chapter-4: Introduction to Web Design and HTML",
+          "Chapter-5: Programming Language",
+          "Chapter-6: Database Management System"
+        ]
+      },
+      SSC: {
+        Physics: [
+          "Chapter-1: Physics World and Measurement",
+          "Chapter-2: Motion and its Laws",
+          "Chapter-3: Force and Momentum",
+          "Chapter-4: Work, Power, and Energy",
+          "Chapter-5: State of Matters and Pressure",
+          "Chapter-6: Heat and Temperature"
+        ],
+        Chemistry: [
+          "Chapter-1:Concept of Chemistry",
+          "Chapter-2:States of Matter",
+          "Chapter-3:Structure of Matter",
+          "Chapter-4:Periodic Table",
+          "Chapter-5:Chemical Bonds",
+          "Chapter-6:Concept of Mole and Chemical Calculations",
+          "Chapter-7:Chemical Reaction",
+          "Chapter-8:Chemistry and Energy",
+          "Chapter-9:Acid-Base Balance",
+          "Chapter-10:Mineral Resources: Metal-Nonmetal",
+          "Chapter-11:Mineral Resources-Fossil",
+          "Chapter-12:Chemistry in our Life"
+
+        ],
+        Math: [
+          "Chapter-1: Set and Function",
+          "Chapter-2: Algebraic Expression",
+          "Chapter-3: Geometry",
+          "Chapter-4: Geometric Constructions",
+          "Chapter-5: Equation",
+          "Chapter-6: Inequality",
+          "Chapter-7: Infinite Series",
+          "Chapter-8: Trigonometry",
+          "Chapter-9: Exponential and Logarithmic Function",
+          "Chapter-10: Binomial Expansion",
+          "Chapter-11: Coordinate Geometry",
+          "Chapter-12: Planar Vector",
+          "Chapter-13: Solid Geometry",
+          "Chapter-14: Probability"
+        ],
+        Biology: [
+          "Chapter-1: Lessons on Life",
+          "Chapter-2: Cells and Tissues of Organisms",
+          "Chapter-3: Cell Division",
+          "Chapter-4: Bioenergetics",
+          "Chapter-5: Food, Nutrition and Digestion",
+          "Chapter-6: Transport in Organisms",
+          "Chapter-7: Exchange of Gases",
+          "Chapter-8: Excretory System",
+          "Chapter-9: Firmness and Locomotion",
+          "Chapter-10: Co-ordination",
+          "Chapter-11: Reproduction in Organism",
+          "Chapter-12: Heredity in Organisms and Biological Evolution",
+          "Chapter-13: Environment of life",
+          "Chapter-14: Biotechnology"
+        ],
+        ICT: [
+          "Chapter-1: Information and Communication Technology and Our Bangladesh",
+          "Chapter-2: Computer and The Security of the User",
+          "Chapter-3: The Internet in My Education",
+          "Chapter-4: My Writing and Accounts",
+          "Chapter-5: Multimedia and Graphics",
+          "Chapter-6: The User of Database"
+
+        ]
+      }
+    };
+
+    function updateForm() {
+      const lvl = level.value;
+      const sub = subject.value;
+      const type = examType.value;
+
+      examType.disabled = lvl === 'Others';
+      subject.disabled = lvl === 'Others';
+      paper.disabled = lvl === 'Others' || lvl === 'SSC' || sub === 'ICT' || sub === 'Others';
+      chapter.disabled = lvl === 'Others' || type === 'Subjectwise' || sub === 'Others';
+
+      updateChapters();
+    }
+
+    function updateChapters() {
+      chapter.innerHTML = '<option value="">Select chapter</option>';
+      const lvl = level.value;
+      const sub = subject.value;
+      const ppr = paper.value;
+
+      let chapters = [];
+
+      if (lvl === 'HSC') {
+        if (Array.isArray(chapterData.HSC?.[sub])) {
+          // Case like ICT: no paper division
+          chapters = chapterData.HSC[sub];
+        } else if (chapterData.HSC?.[sub]?.[ppr]) {
+          // Normal paper-based case
+          chapters = chapterData.HSC[sub][ppr];
+        }
+      } else if (lvl === 'SSC') {
+        if (Array.isArray(chapterData.SSC?.[sub])) {
+          chapters = chapterData.SSC[sub];
+        } else if (chapterData.SSC?.[sub]?.[ppr]) {
+          chapters = chapterData.SSC[sub][ppr];
+        }
+      }
+
+      chapters?.forEach(ch => {
+        const option = document.createElement('option');
+        option.textContent = ch;
+        option.value = ch;
+        chapter.appendChild(option);
+      });
+    }
+
+    level.addEventListener('change', updateForm);
+    subject.addEventListener('change', updateForm);
+    examType.addEventListener('change', updateForm);
+    paper.addEventListener('change', updateChapters);
+
+    document.getElementById("examForm").addEventListener("submit", function (e) {
+      const start = new Date(document.getElementById("startTime").value);
+      const end = new Date(document.getElementById("endTime").value);
+      const now = new Date();
+      if (start < now || end < now || end <= start) {
+        alert("Please select valid future times for start and end.");
+        e.preventDefault();
+      }
+
+      // Send disabled fields as null
+    //   const form = this;
+    //   const elements = form.elements;
+    //   for (let i = 0; i < elements.length; i++) {
+    //     const el = elements[i];
+    //     if ((el.tagName === "SELECT" || el.tagName === "INPUT") && el.name) {
+    //       if (el.disabled || el.value === "") {
+    //         const hidden = document.createElement("input");
+    //         hidden.type = "hidden";
+    //         hidden.name = el.name;
+    //         hidden.value = "";
+    //         form.appendChild(hidden);
+    //         el.disabled = true;
+    //       }
+    //     }
+    //   }
+    });
+  </script>
+</body>
+
+</html>
